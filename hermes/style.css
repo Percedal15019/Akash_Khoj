@@ -1,0 +1,824 @@
+/* =====================================================
+   HERMES HANDBOOK — Ancient Roman Flipbook Stylesheet
+   ===================================================== */
+
+:root {
+  /* Solid background to fix readibility */
+  --parchment-solid: #eedcb8;
+  --parchment-light: #f4ebd2;
+  --parchment-mid: #b39b70;
+  --parchment-dark: #8a714c;
+  --parchment-shadow: #594528;
+  --ink: #26190d;
+  /* Very dark espresso text */
+  --ink-faded: #4f3b25;
+  /* Dark brown readable text */
+  --gold: #c8960a;
+  --gold-light: #e8b84b;
+  --crimson: #7a1a0c;
+  --deep-bg: #050301;
+
+  --page-w: 440px;
+  --page-h: 580px;
+  --book-w: calc(var(--page-w) * 2);
+  --book-h: var(--page-h);
+
+  --flip-duration: 2s;
+  --flip-easing: cubic-bezier(0.25, 1, 0.5, 1);
+  /* Slower, majestic easeOut */
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--deep-bg);
+  font-family: 'IM Fell English', Georgia, serif;
+  color: var(--ink);
+  user-select: none;
+}
+
+/* ===================== AMBIANCE ===================== */
+.scene-bg {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse 90% 60% at 50% 100%, #170d02 0%, #030100 80%);
+  z-index: 0;
+}
+
+.candlelight-glow {
+  position: absolute;
+  width: 500px;
+  height: 600px;
+  border-radius: 50%;
+  filter: blur(120px);
+  pointer-events: none;
+  animation: flicker 4s ease-in-out infinite alternate;
+}
+
+.candlelight-glow.left {
+  background: radial-gradient(circle, rgba(220, 110, 10, 0.18) 0%, transparent 50%);
+  left: -150px;
+  top: 0;
+  animation-delay: 0s;
+}
+
+.candlelight-glow.right {
+  background: radial-gradient(circle, rgba(180, 90, 5, 0.15) 0%, transparent 50%);
+  right: -150px;
+  top: 0;
+  animation-delay: 1.2s;
+}
+
+@keyframes flicker {
+  0% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.7;
+  }
+}
+
+.table-surface {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 35%;
+  background: linear-gradient(to top, #0f0701 0%, transparent 100%);
+  pointer-events: none;
+}
+
+/* ===================== INTRO ===================== */
+#intro-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 1.2s ease, visibility 1.2s ease;
+}
+
+#intro-screen.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.intro-content {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  animation: introReveal 1.8s ease forwards;
+}
+
+@keyframes introReveal {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.intro-eagle {
+  font-size: 3.5rem;
+  color: var(--gold);
+  text-shadow: 0 0 40px rgba(180, 120, 10, 0.8);
+  margin-bottom: 0.5rem;
+  animation: pulse 3s infinite;
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+    text-shadow: 0 0 60px rgba(220, 160, 20, 1);
+  }
+}
+
+.intro-title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  line-height: 1;
+  color: #fffcf2;
+  text-shadow: 0 5px 15px rgba(0, 0, 0, 1), 0 0 30px rgba(180, 120, 10, 0.6);
+  margin-bottom: 0.5rem;
+}
+
+.intro-title span {
+  color: var(--gold-light);
+}
+
+.intro-sub {
+  font-family: 'IM Fell English SC', serif;
+  font-size: clamp(0.9rem, 2vw, 1.2rem);
+  letter-spacing: 0.3em;
+  color: var(--parchment-mid);
+  margin-bottom: 3rem;
+}
+
+#open-book-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: 1px solid var(--gold);
+  padding: 16px 48px;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+  margin: 0 auto;
+}
+
+#open-book-btn:hover {
+  border-color: var(--gold-light);
+  box-shadow: 0 0 30px rgba(180, 120, 10, 0.4);
+  transform: translateY(-2px);
+}
+
+#open-book-btn span {
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  color: var(--gold-light);
+}
+
+#open-book-btn small {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 0.8rem;
+  color: var(--parchment-mid);
+  opacity: 0.8;
+}
+
+/* ===================== VIEWPORT & NAV ===================== */
+#book-viewport {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  gap: 16px;
+  transition: opacity 0.8s ease;
+}
+
+#book-viewport.hidden {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.book-nav {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  z-index: 60;
+  margin-bottom: 5px;
+}
+
+.nav-btn {
+  font-family: 'Cinzel', serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  color: var(--parchment-solid);
+  background: transparent;
+  border: 1px solid rgba(180, 120, 10, 0.4);
+  padding: 10px 24px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.nav-btn:hover {
+  color: var(--gold-light);
+  border-color: var(--gold);
+  box-shadow: 0 0 15px rgba(180, 120, 10, 0.3);
+}
+
+.nav-btn:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+}
+
+.page-indicator {
+  font-family: 'IM Fell English SC', serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.3em;
+  color: var(--parchment-solid);
+}
+
+#close-book-btn {
+  font-family: 'Cinzel', serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  color: rgba(180, 120, 10, 0.6);
+  background: transparent;
+  border: 1px solid rgba(180, 120, 10, 0.2);
+  padding: 8px 20px;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-top: 10px;
+}
+
+#close-book-btn:hover {
+  color: var(--crimson);
+  border-color: var(--crimson);
+  box-shadow: 0 0 15px rgba(100, 20, 10, 0.4);
+}
+
+/* ===================== THE BOOK ===================== */
+.book {
+  position: relative;
+  width: var(--book-w);
+  height: var(--book-h);
+  perspective: 3000px;
+  transform-style: preserve-3d;
+  filter: drop-shadow(0 40px 80px rgba(0, 0, 0, 1)) drop-shadow(0 15px 30px rgba(0, 0, 0, 0.8));
+}
+
+/* ===================== PAGE STRUCTURE ===================== */
+.page {
+  position: absolute;
+  top: 0;
+  left: var(--page-w);
+  width: var(--page-w);
+  height: var(--page-h);
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  z-index: 1;
+  cursor: pointer;
+  /* VERY IMPORTANT: A solid backing color so text is 100% readable regardless of the ragged PNG opacity */
+  background-color: var(--parchment-solid);
+  transform: rotateY(0deg) rotateZ(calc((var(--page-index, 0) * 0.2deg) - 0.5deg));
+  transition: transform var(--flip-duration) var(--flip-easing);
+  /* Hard clip the corners slightly so the image mask defines the final ragged shape */
+  border-radius: 6px 16px 16px 6px;
+}
+
+.page-front,
+.page-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform-style: preserve-3d;
+  /* The ragged image is drawn OVER the solid parchment background as a mask-like texture */
+  background-image:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(200, 180, 140, 0.1) 50%, rgba(100, 60, 20, 0.15) 100%),
+    url('C:/Users/Vedant/.gemini/antigravity/brain/ce0c2480-c40c-4239-9203-75cb67e34704/ragged_ancient_page_1772294070729.png');
+  background-size: 100% 100%;
+  background-position: center;
+  border-radius: inherit;
+}
+
+.page-back {
+  transform: rotateY(180deg);
+}
+
+/* Spine Shadows */
+.page-front::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 60px;
+  height: 100%;
+  background: linear-gradient(to right, rgba(20, 10, 0, 0.7) 0%, rgba(50, 25, 5, 0.2) 40%, transparent 100%);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.page-back::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 60px;
+  height: 100%;
+  background: linear-gradient(to left, rgba(20, 10, 0, 0.7) 0%, rgba(50, 25, 5, 0.2) 40%, transparent 100%);
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* ================= THE PEEL EFFECT (LIGHTING/SHADOW SWEEP) ================= */
+/* We simulate the Peel.js bend by casting shadows and highlights across the page while it moves in 3D */
+
+.page-front::after,
+.page-back::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 20;
+  background: linear-gradient(to left,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(0, 0, 0, 0) 30%,
+      rgba(0, 0, 0, 0.4) 45%,
+      /* The deep shadow of the curve */
+      rgba(255, 255, 255, 0.6) 55%,
+      /* The glossy highlight catching the light */
+      rgba(0, 0, 0, 0.2) 70%,
+      rgba(255, 255, 255, 0) 100%);
+  background-size: 400% 100%;
+  /* Extremely wide so it can sweep entirely across */
+  background-position: 100% 0;
+  /* Starts hidden to the right */
+  opacity: 0;
+  transition: opacity 0.3s ease, background-position var(--flip-duration) var(--flip-easing);
+}
+
+/* While turning... */
+.page.turning {
+  z-index: 200 !important;
+}
+
+/* Sweep shadow across the FRONT face during the first half of the flip */
+.page.turning:not(.flipped) .page-front::after {
+  opacity: 1;
+  background-position: -50% 0;
+}
+
+/* Sweep shadow across the BACK face during the second half of the flip */
+.page.turning.flipped .page-back::after {
+  opacity: 1;
+  background-position: 150% 0;
+  /* Moves opposite direction because face is mirrored */
+}
+
+/* Base rotated state (closed vs flipped stack mechanics) */
+.page.flipped {
+  transform: rotateY(-180deg) rotateZ(calc((var(--page-index, 0) * -0.2deg) + 0.5deg));
+}
+
+.page:not(.flipped):hover {
+  transform: rotateY(-4deg) rotateX(1deg);
+  transition: transform 0.4s ease;
+  box-shadow: -15px 5px 25px rgba(0, 0, 0, 0.5);
+}
+
+.page.flipped:hover {
+  transform: rotateY(-176deg) rotateX(1deg);
+  transition: transform 0.4s ease;
+  box-shadow: 15px 5px 25px rgba(0, 0, 0, 0.5);
+}
+
+/* ===================== PAGE CONTENT LAYOUT ===================== */
+/* Inner bounds tight enough to avoid the ragged physical paper edges */
+.page-content {
+  position: absolute;
+  inset: 0;
+  padding: 50px 48px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* Faint inner border framing the text */
+.page-content::before {
+  content: '';
+  position: absolute;
+  inset: 35px;
+  border: 1px solid rgba(80, 50, 10, 0.25);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.page-content::after {
+  content: '';
+  position: absolute;
+  inset: 40px;
+  border: 1px solid rgba(80, 50, 10, 0.1);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.page-number {
+  font-family: 'IM Fell English SC', serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.25em;
+  color: var(--ink-faded);
+  opacity: 0.8;
+  text-align: center;
+  margin-bottom: 15px;
+  position: relative;
+  z-index: 1;
+}
+
+.section-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--crimson);
+  text-align: center;
+  margin-bottom: 8px;
+  font-weight: 700;
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.4);
+}
+
+.page-title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 1.3rem;
+  font-weight: 900;
+  text-align: center;
+  color: var(--ink);
+  line-height: 1.25;
+  margin-bottom: 12px;
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+}
+
+.ornament {
+  text-align: center;
+  font-size: 1.2rem;
+  color: var(--crimson);
+  margin: 8px 0;
+  letter-spacing: 0.3em;
+  position: relative;
+  z-index: 1;
+  line-height: 1;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
+}
+
+.ornament::before,
+.ornament::after {
+  content: '——';
+  font-family: serif;
+  opacity: 0.4;
+  margin: 0 8px;
+  color: var(--ink-faded);
+}
+
+.page-body {
+  font-family: 'IM Fell English', serif;
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: var(--ink);
+  text-align: justify;
+  font-weight: 500;
+  hyphens: auto;
+  position: relative;
+  z-index: 1;
+  flex: 1;
+}
+
+.page-body p+p {
+  text-indent: 1.8em;
+  margin-top: 0;
+}
+
+.page-body em {
+  font-style: italic;
+  color: var(--crimson);
+}
+
+.page-body strong {
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  color: var(--ink);
+  font-weight: 900;
+}
+
+.page-body p:first-child::first-letter {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 3.5rem;
+  font-weight: 900;
+  float: left;
+  line-height: 0.8;
+  margin-right: 10px;
+  margin-top: 8px;
+  color: var(--crimson);
+  text-shadow: 2px 2px 0 var(--gold-light), 3px 3px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Legible, distinct layout for images */
+.image-slot {
+  width: 100%;
+  flex-shrink: 0;
+  border: 2px solid rgba(80, 40, 10, 0.4);
+  background: rgba(255, 255, 255, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  margin: 15px 0;
+  min-height: 160px;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0, 0, 0, 0.15);
+  position: relative;
+  z-index: 1;
+}
+
+.image-slot img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.image-slot .img-placeholder {
+  font-family: 'Cinzel', serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  color: rgba(80, 40, 10, 0.7);
+  border: 2px dashed rgba(80, 40, 10, 0.5);
+  padding: 25px;
+  text-align: center;
+  width: 100%;
+}
+
+.roman-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'IM Fell English', serif;
+  font-size: 0.85rem;
+  color: var(--ink);
+  font-weight: 500;
+  margin: 15px 0;
+  position: relative;
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.roman-table th {
+  font-family: 'Cinzel', serif;
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  color: var(--crimson);
+  border-bottom: 2px solid rgba(80, 50, 10, 0.6);
+  padding: 8px;
+  text-align: left;
+}
+
+.roman-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid rgba(80, 50, 10, 0.25);
+}
+
+/* ===================== COVER REDESIGN (ATTRACTIVE & EMBOSSED) ===================== */
+
+.cover-content {
+  inset: 0;
+  padding: 50px 45px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  position: relative;
+}
+
+/* Ornate grimoire border frames */
+.cover-border {
+  position: absolute;
+  inset: 25px;
+  border: 3px solid rgba(220, 180, 80, 0.8);
+  border-radius: 4px;
+  pointer-events: none;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(0, 0, 0, 0.6);
+}
+
+.cover-border::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border: 1px solid rgba(220, 180, 80, 0.4);
+}
+
+.cover-border::after {
+  content: '';
+  position: absolute;
+  inset: -12px;
+  border: 2px double rgba(220, 180, 80, 0.3);
+}
+
+.cover-top-ornament {
+  font-size: 3rem;
+  color: #ffd975;
+  text-shadow: 0 -2px 5px rgba(0, 0, 0, 0.8), 0 0 20px rgba(220, 170, 70, 0.5);
+  letter-spacing: 0.5em;
+  margin-bottom: 20px;
+}
+
+.cover-eagle {
+  font-size: 5rem;
+  color: #ffd975;
+  text-shadow: 0 4px 15px rgba(0, 0, 0, 1), 0 -2px 4px rgba(255, 255, 255, 0.4), 0 0 40px rgba(255, 180, 50, 0.5);
+  margin-bottom: 20px;
+}
+
+/* Metallic embossed title */
+.cover-title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: #f7e1a3;
+  letter-spacing: 0.15em;
+  line-height: 1.1;
+  text-shadow:
+    0 -1px 1px rgba(255, 255, 255, 0.6),
+    0 4px 8px rgba(0, 0, 0, 0.9),
+    0 10px 25px rgba(0, 0, 0, 0.6),
+    0 0 30px rgba(255, 200, 80, 0.3);
+  margin-bottom: 30px;
+}
+
+.cover-title .subtitle {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.4em;
+  display: block;
+  margin-top: 15px;
+  color: #d6b356;
+  font-family: 'IM Fell English SC', serif;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.cover-divider {
+  width: 80%;
+  height: 2px;
+  background: linear-gradient(to right, transparent, rgba(220, 180, 80, 0.8), transparent);
+  margin: 0 auto 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.8);
+}
+
+.cover-subtitle {
+  font-family: 'IM Fell English SC', serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.4em;
+  font-weight: 700;
+  color: rgba(220, 180, 80, 0.9);
+  line-height: 2;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
+  margin-bottom: 40px;
+}
+
+.cover-bottom {
+  font-family: 'Cinzel', serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.5em;
+  color: rgba(200, 150, 60, 0.8);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
+  position: absolute;
+  bottom: 50px;
+}
+
+/* ===================== TOC ===================== */
+.toc-entry {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: 'IM Fell English', serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--ink);
+  padding: 8px 0;
+  border-bottom: 1px dotted rgba(80, 50, 10, 0.5);
+  position: relative;
+  z-index: 1;
+}
+
+.toc-entry .toc-chapter {
+  font-family: 'Cinzel', serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--crimson);
+  max-width: 80%;
+}
+
+.toc-entry .toc-page-num {
+  font-family: 'IM Fell English SC', serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-left: 10px;
+  color: var(--ink);
+}
+
+/* ===================== BOOK ANIM ===================== */
+@keyframes bookOpen {
+  0% {
+    transform: scaleX(0.05) scaleY(0.9);
+    opacity: 0;
+  }
+
+  50% {
+    transform: scaleX(0.5) scaleY(0.98);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: scaleX(1) scaleY(1);
+    opacity: 1;
+  }
+}
+
+@keyframes bookClose {
+  0% {
+    transform: scaleX(1) scaleY(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scaleX(0.5) scaleY(0.98);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: scaleX(0.05) scaleY(0.9);
+    opacity: 0;
+  }
+}
+
+.book.opening {
+  animation: bookOpen 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.book.closing {
+  animation: bookClose 1s cubic-bezier(0.8, 0.0, 0.8, 0.2) forwards;
+}

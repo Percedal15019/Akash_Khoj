@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hermes HandBook — Ancient Roman Astronomy</title>
+  <meta name="description"
+    content="An ancient Roman-style virtual flipbook exploring constellations and planets of the cosmos." />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;900&display=swap"
+    rel="stylesheet" />
+</head>
+
+<body>
+
+  <!-- Ambient environment -->
+  <div class="scene-bg">
+    <div class="candlelight-glow left"></div>
+    <div class="candlelight-glow right"></div>
+    <div class="table-surface"></div>
+  </div>
+
+  <!-- Intro Screen -->
+  <div id="intro-screen">
+    <div class="intro-content">
+      <div class="intro-eagle">⚜</div>
+      <h1 class="intro-title">HERMES<br><span>HANDBOOK</span></h1>
+      <p class="intro-sub">Codex Astronomica</p>
+      <button id="open-book-btn" aria-label="Open the Hermes HandBook">
+        <span>APERIRE LIBRUM</span>
+        <small>Open the Book</small>
+      </button>
+    </div>
+    <div class="intro-dust"></div>
+  </div>
+
+  <!-- Main Flipbook -->
+  <div id="book-viewport" class="hidden">
+
+    <!-- Navigation Controls -->
+    <div class="book-nav" id="book-nav">
+      <button id="btn-prev" class="nav-btn" aria-label="Previous page">&#8592; RETRO</button>
+      <div class="page-indicator">
+        <span id="current-page-display">I</span>
+        <span class="divider">OF</span>
+        <span id="total-page-display">XII</span>
+      </div>
+      <button id="btn-next" class="nav-btn" aria-label="Next page">PROXIMO &#8594;</button>
+    </div>
+
+    <!-- The Book Container -->
+    <div id="book" class="book closed" role="document" aria-label="Hermes HandBook">
+      <!-- Pages are injected by JS -->
+    </div>
+
+    <!-- Close Book Button -->
+    <button id="close-book-btn" aria-label="Close the book">
+      ✕ CLAUDERE LIBRUM
+    </button>
+
+  </div>
+
+  <!-- Page Turn Sound (optional) -->
+  <script src="pages.js"></script>
+  <script src="flipbook.js"></script>
+</body>
+
+</html>
