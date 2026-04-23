@@ -1,0 +1,1433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lunara — Moon Phases & Stargazing</title>
+  <meta name="description" content="An immersive, real-time 3D moon phases and stargazing conditions app powered by Three.js, SunCalc, and Open-Meteo." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
+
+  <!-- Three.js r158 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- SunCalc -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.9.0/suncalc.min.js"></script>
+
+  <style>
+    /* ==============================
+       DESIGN TOKENS & RESET
+    ============================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --obsidian:       #080810;
+      --void:           #0a0a14;
+      --deep:           #0f0f1e;
+      --surface:        rgba(255,255,255,0.03);
+      --glass:          rgba(255,255,255,0.06);
+      --glass-border:   rgba(255,255,255,0.09);
+      --text-primary:   #f0eeff;
+      --text-muted:     rgba(200,195,230,0.55);
+      --text-accent:    #c8b8ff;
+      --accent-violet:  #7c5cbf;
+      --accent-lavender:#a88be0;
+
+      /* Stargazing condition colors */
+      --good-glow:     #00ffb0;
+      --good-soft:     rgba(0,255,176,0.18);
+      --mid-glow:      #ffcc44;
+      --mid-soft:      rgba(255,204,68,0.18);
+      --bad-glow:      #ff4466;
+      --bad-soft:      rgba(255,68,102,0.18);
+
+      --current-glow:  var(--mid-glow);
+      --current-soft:  var(--mid-soft);
+
+      --font-serif:    'Playfair Display', Georgia, serif;
+      --font-sans:     'DM Sans', system-ui, sans-serif;
+      --radius-lg:     20px;
+      --radius-md:     12px;
+      --radius-sm:     8px;
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      background: var(--obsidian);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      overflow: hidden;
+    }
+
+    /* ==============================
+       ANIMATED STAR FIELD CANVAS
+    ============================== */
+    #star-canvas {
+      position: fixed; inset: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ==============================
+       LAYOUT
+    ============================== */
+    #app {
+      display: flex;
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* LEFT — 3D VIEWPORT */
+    #viewport {
+      flex: 0 0 52%;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #moon-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    /* Glow aura behind moon */
+    #moon-aura {
+      position: absolute;
+      width: 360px; height: 360px;
+      border-radius: 50%;
+      left: 50%; top: 50%;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(circle, var(--current-soft) 0%, transparent 70%);
+      box-shadow: 0 0 120px 60px var(--current-soft);
+      pointer-events: none;
+      transition: background 1.2s ease, box-shadow 1.2s ease;
+      z-index: 2;
+    }
+
+    /* Condition badge on aura */
+    #condition-badge {
+      position: absolute;
+      top: 22px; left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      backdrop-filter: blur(14px);
+      background: rgba(10,10,20,0.55);
+      border: 1px solid var(--glass-border);
+      color: var(--current-glow);
+      z-index: 10;
+      transition: color 1.2s ease;
+    }
+    #condition-badge .dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--current-glow);
+      box-shadow: 0 0 8px var(--current-glow);
+      transition: background 1.2s ease, box-shadow 1.2s ease;
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%,100%{ transform: scale(1); opacity:1; }
+      50%{ transform: scale(1.4); opacity:.7; }
+    }
+
+    /* Gauges row */
+    #gauges {
+      position: absolute;
+      bottom: 28px; left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 20px;
+      z-index: 10;
+    }
+    .gauge-card {
+      backdrop-filter: blur(18px);
+      background: rgba(10,10,25,0.6);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: 14px 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 100px;
+      gap: 8px;
+    }
+    .gauge-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .gauge-ring {
+      position: relative;
+      width: 64px; height: 64px;
+    }
+    .gauge-ring svg {
+      transform: rotate(-90deg);
+      width: 64px; height: 64px;
+    }
+    .gauge-ring svg circle.track {
+      fill: none;
+      stroke: rgba(255,255,255,0.07);
+      stroke-width: 5;
+    }
+    .gauge-ring svg circle.fill {
+      fill: none;
+      stroke-width: 5;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 1s cubic-bezier(.4,0,.2,1), stroke 1s;
+      stroke: var(--accent-lavender);
+    }
+    .gauge-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .gauge-value {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    /* Drag hint */
+    #drag-hint {
+      position: absolute;
+      bottom: 110px; left: 50%;
+      transform: translateX(-50%);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      opacity: 0.7;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    /* RIGHT — CONTROL PANEL */
+    #panel {
+      flex: 0 0 48%;
+      overflow-y: auto;
+      padding: 32px 36px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      background: rgba(8,8,18,0.5);
+      backdrop-filter: blur(24px);
+      border-left: 1px solid var(--glass-border);
+      scrollbar-width: thin;
+      scrollbar-color: rgba(168,139,224,0.25) transparent;
+      position: relative;
+      z-index: 5;
+    }
+    #panel::-webkit-scrollbar { width: 4px; }
+    #panel::-webkit-scrollbar-thumb { background: rgba(168,139,224,0.25); border-radius: 2px; }
+
+    /* Wordmark */
+    #wordmark {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    #wordmark h1 {
+      font-family: var(--font-serif);
+      font-size: 2rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      background: linear-gradient(135deg, #e8d5ff 0%, #a88be0 50%, #6c4fb0 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.1;
+    }
+    #wordmark .subtitle {
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    /* Section headers */
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .section-header .line {
+      flex: 1;
+      height: 1px;
+      background: var(--glass-border);
+    }
+    .section-header span {
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    /* Glass card */
+    .glass-card {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: 20px 22px;
+    }
+
+    /* ==============================
+       CALENDAR
+    ============================== */
+    #calendar-section {}
+    #cal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    #cal-month-label {
+      font-family: var(--font-serif);
+      font-size: 1.05rem;
+      font-weight: 400;
+      color: var(--text-primary);
+    }
+    .cal-nav-btn {
+      background: none;
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm);
+      padding: 5px 11px;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 15px;
+      transition: border-color .2s, color .2s, background .2s;
+      line-height: 1;
+    }
+    .cal-nav-btn:hover {
+      border-color: var(--accent-lavender);
+      color: var(--accent-lavender);
+      background: rgba(168,139,224,0.08);
+    }
+    #cal-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 3px;
+      margin-bottom: 6px;
+    }
+    #cal-weekdays span {
+      text-align: center;
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 4px 0;
+    }
+    #cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 3px;
+    }
+    .cal-day {
+      position: relative;
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: background .15s, color .15s;
+      overflow: hidden;
+    }
+    .cal-day:not(.empty):hover {
+      background: rgba(168,139,224,0.12);
+      color: var(--text-primary);
+    }
+    .cal-day.today {
+      color: var(--accent-lavender);
+      font-weight: 600;
+    }
+    .cal-day.today::after {
+      content: '';
+      position: absolute;
+      bottom: 4px; left: 50%;
+      transform: translateX(-50%);
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: var(--accent-lavender);
+    }
+    .cal-day.selected {
+      background: rgba(124,92,191,0.3) !important;
+      border: 1px solid var(--accent-violet);
+      color: var(--text-primary) !important;
+    }
+    .cal-day.has-event::before {
+      content:'';
+      position: absolute;
+      top: 3px; right: 3px;
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--good-glow);
+      opacity: .7;
+    }
+
+    /* ==============================
+       MOON DATA GRID
+    ============================== */
+    #data-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .data-cell {
+      background: rgba(255,255,255,0.025);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .data-cell .dc-label {
+      font-size: 9px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .data-cell .dc-value {
+      font-size: 1.35rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      line-height: 1.1;
+    }
+    .data-cell .dc-value span {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+    .data-cell .dc-sub {
+      font-size: 10px;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    /* ==============================
+       PHASE PROGRESS BAR
+    ============================== */
+    #phase-bar-section {}
+    .phase-names {
+      display: flex;
+      justify-content: space-between;
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    #phase-bar-wrap {
+      position: relative;
+      height: 8px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 999px;
+      overflow: visible;
+    }
+    #phase-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #2a1850 0%, #7c5cbf 50%, #c8b8ff 100%);
+      transition: width 0.9s cubic-bezier(.4,0,.2,1);
+    }
+    #phase-bar-thumb {
+      position: absolute;
+      top: 50%; transform: translateY(-50%);
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: #c8b8ff;
+      box-shadow: 0 0 10px #c8b8ff;
+      transition: left 0.9s cubic-bezier(.4,0,.2,1);
+    }
+    #phase-name-display {
+      margin-top: 10px;
+      font-size: 12px;
+      text-align: center;
+      color: var(--text-accent);
+      font-style: italic;
+      font-family: var(--font-serif);
+    }
+
+    /* ==============================
+       UPCOMING EVENTS
+    ============================== */
+    #events-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .event-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.025);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      transition: background .2s;
+    }
+    .event-item:hover { background: rgba(255,255,255,0.045); }
+    .event-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .event-body { flex: 1; }
+    .event-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+    .event-date {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .event-badge {
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-weight: 600;
+    }
+    .badge-new   { background: rgba(0,255,176,0.12);  color: var(--good-glow);  border: 1px solid rgba(0,255,176,0.25); }
+    .badge-full  { background: rgba(255,204,68,0.12); color: var(--mid-glow);   border: 1px solid rgba(255,204,68,0.25); }
+    .badge-super { background: rgba(168,139,224,0.15); color: var(--accent-lavender); border: 1px solid rgba(168,139,224,0.3); }
+
+    /* ==============================
+       LOCATION BAR
+    ============================== */
+    #location-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--text-muted);
+      padding: 10px 14px;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+    }
+    #location-bar .loc-icon { font-size: 14px; }
+    #location-text { flex: 1; }
+    #refresh-loc {
+      background: none; border: none;
+      color: var(--text-muted);
+      cursor: pointer; font-size: 14px;
+      transition: color .2s, transform .3s;
+      padding: 2px;
+    }
+    #refresh-loc:hover { color: var(--accent-lavender); transform: rotate(180deg); }
+
+    /* ==============================
+       WEATHER ROW
+    ============================== */
+    #weather-row {
+      display: flex;
+      gap: 10px;
+    }
+    .weather-chip {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .weather-chip .wc-val {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .weather-chip .wc-icon { font-size: 18px; }
+
+    /* ==============================
+       TOAST
+    ============================== */
+    #toast-container {
+      position: fixed;
+      bottom: 30px; left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: center;
+      pointer-events: none;
+    }
+    .toast {
+      background: rgba(15,15,30,0.92);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(20px);
+      color: var(--text-primary);
+      font-size: 12px;
+      padding: 10px 20px;
+      border-radius: 999px;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity .35s, transform .35s;
+      pointer-events: auto;
+    }
+    .toast.show {
+      opacity: 1; transform: translateY(0);
+    }
+
+    /* ==============================
+       RESPONSIVE
+    ============================== */
+    @media (max-width: 860px) {
+      html, body { overflow: auto; }
+      #app { flex-direction: column; height: auto; }
+      #viewport { flex: none; height: 60vw; max-height: 380px; width: 100%; }
+      #panel { flex: none; width: 100%; border-left: none; border-top: 1px solid var(--glass-border); padding: 24px 18px 36px; overflow-y: visible; }
+      #data-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 480px) {
+      #viewport { height: 72vw; }
+      #data-grid { grid-template-columns: 1fr; }
+      #panel { padding: 18px 14px 30px; }
+    }
+
+    /* fade in */
+    @keyframes fadeUp {
+      from { opacity:0; transform: translateY(18px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+    .glass-card, #data-grid, #location-bar, #weather-row {
+      animation: fadeUp 0.7s cubic-bezier(.4,0,.2,1) both;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Background star field -->
+<canvas id="star-canvas"></canvas>
+
+<div id="app">
+  <!-- LEFT: 3D Viewport -->
+  <section id="viewport" aria-label="3D Moon Viewport">
+    <canvas id="moon-canvas"></canvas>
+    <div id="moon-aura"></div>
+
+    <!-- Condition badge -->
+    <div id="condition-badge">
+      <span class="dot"></span>
+      <span id="condition-text">Calculating…</span>
+    </div>
+
+    <!-- Drag hint -->
+    <div id="drag-hint">drag to rotate</div>
+
+    <!-- Gauges -->
+    <div id="gauges">
+      <!-- Wind gauge -->
+      <div class="gauge-card">
+        <span class="gauge-label">Wind</span>
+        <div class="gauge-ring">
+          <svg viewBox="0 0 64 64">
+            <circle class="track" cx="32" cy="32" r="27" stroke-dasharray="169.65" stroke-dashoffset="0"/>
+            <circle class="fill" id="wind-ring" cx="32" cy="32" r="27"
+              stroke-dasharray="169.65" stroke-dashoffset="169.65"/>
+          </svg>
+          <div class="gauge-center" id="wind-center">—</div>
+        </div>
+        <span class="gauge-value" id="wind-label">km/h</span>
+      </div>
+      <!-- Cloud cover -->
+      <div class="gauge-card">
+        <span class="gauge-label">Clouds</span>
+        <div class="gauge-ring">
+          <svg viewBox="0 0 64 64">
+            <circle class="track" cx="32" cy="32" r="27" stroke-dasharray="169.65" stroke-dashoffset="0"/>
+            <circle class="fill" id="cloud-ring" cx="32" cy="32" r="27"
+              stroke-dasharray="169.65" stroke-dashoffset="169.65"
+              style="stroke:#60a5fa;"/>
+          </svg>
+          <div class="gauge-center" id="cloud-center">—</div>
+        </div>
+        <span class="gauge-value" id="cloud-label">%</span>
+      </div>
+      <!-- Illumination -->
+      <div class="gauge-card">
+        <span class="gauge-label">Luminosity</span>
+        <div class="gauge-ring">
+          <svg viewBox="0 0 64 64">
+            <circle class="track" cx="32" cy="32" r="27" stroke-dasharray="169.65" stroke-dashoffset="0"/>
+            <circle class="fill" id="illum-ring" cx="32" cy="32" r="27"
+              stroke-dasharray="169.65" stroke-dashoffset="169.65"
+              style="stroke:#f6d860;"/>
+          </svg>
+          <div class="gauge-center" id="illum-center">—</div>
+        </div>
+        <span class="gauge-value" id="illum-label">%</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- RIGHT: Control Panel -->
+  <aside id="panel" aria-label="Control Panel">
+    <div id="wordmark">
+      <h1>Lunara</h1>
+      <p class="subtitle">Moon Phases &amp; Stargazing</p>
+    </div>
+
+    <!-- Location & Weather -->
+    <div id="location-bar">
+      <span class="loc-icon">📍</span>
+      <span id="location-text">Acquiring location…</span>
+      <button id="refresh-loc" title="Refresh location">↻</button>
+    </div>
+    <div id="weather-row">
+      <div class="weather-chip">
+        <span class="wc-icon">💨</span>
+        <div>
+          <div class="wc-val" id="wind-display">—</div>
+          <div style="font-size:10px;">Wind speed</div>
+        </div>
+      </div>
+      <div class="weather-chip">
+        <span class="wc-icon">☁️</span>
+        <div>
+          <div class="wc-val" id="cloud-display">—</div>
+          <div style="font-size:10px;">Cloud cover</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Calendar -->
+    <div id="calendar-section" class="glass-card">
+      <div id="cal-header">
+        <button class="cal-nav-btn" id="cal-prev">&#8249;</button>
+        <span id="cal-month-label">Month Year</span>
+        <button class="cal-nav-btn" id="cal-next">&#8250;</button>
+      </div>
+      <div id="cal-weekdays">
+        <span>Su</span><span>Mo</span><span>Tu</span>
+        <span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+      </div>
+      <div id="cal-grid"></div>
+    </div>
+
+    <!-- Phase Progress -->
+    <div id="phase-bar-section" class="glass-card">
+      <div class="section-header">
+        <span>Lunar Cycle</span><div class="line"></div>
+      </div>
+      <div class="phase-names"><span>New</span><span>1st Qtr</span><span>Full</span><span>3rd Qtr</span><span>New</span></div>
+      <div id="phase-bar-wrap">
+        <div id="phase-bar-fill" style="width:0%"></div>
+        <div id="phase-bar-thumb" style="left:0%"></div>
+      </div>
+      <div id="phase-name-display">—</div>
+    </div>
+
+    <!-- Data Grid -->
+    <div>
+      <div class="section-header">
+        <span>Lunar Data</span><div class="line"></div>
+      </div>
+      <div id="data-grid">
+        <div class="data-cell">
+          <span class="dc-label">Illumination</span>
+          <div class="dc-value" id="dc-illum">—<span>%</span></div>
+          <span class="dc-sub" id="dc-illum-sub">—</span>
+        </div>
+        <div class="data-cell">
+          <span class="dc-label">Moon Age</span>
+          <div class="dc-value" id="dc-age">—<span>d</span></div>
+          <span class="dc-sub" id="dc-age-sub">of 29.5 days</span>
+        </div>
+        <div class="data-cell">
+          <span class="dc-label">Distance</span>
+          <div class="dc-value" id="dc-dist">—<span>km</span></div>
+          <span class="dc-sub" id="dc-dist-sub">—</span>
+        </div>
+        <div class="data-cell">
+          <span class="dc-label">Stargazing Score</span>
+          <div class="dc-value" id="dc-score">—<span>/10</span></div>
+          <span class="dc-sub" id="dc-score-sub">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upcoming Events -->
+    <div>
+      <div class="section-header">
+        <span>Upcoming Events</span><div class="line"></div>
+      </div>
+      <div id="events-list">
+        <div class="event-item">
+          <span class="event-icon">🌙</span>
+          <div class="event-body">
+            <div class="event-title">Loading events…</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<script>
+/* ============================================================
+   LUNARA — Moon Phases & Stargazing
+   Stack: Three.js r128 · SunCalc · Open-Meteo API
+   ============================================================ */
+
+// ──────────────────────────────────────────────
+// CONSTANTS
+// ──────────────────────────────────────────────
+const MOON_TEXTURE_URL    = 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/moon_1024.jpg';
+const MOON_DISP_URL       = 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/moon_4k_displacement.jpg';
+const SYNODIC_MONTH       = 29.530588853; // days
+const PERIGEE_KM          = 356500; // approximate perigee threshold for supermoon labeling
+const SUPERMOON_THRESHOLD = 362000; // km
+
+// ──────────────────────────────────────────────
+// STATE
+// ──────────────────────────────────────────────
+let state = {
+  lat:     51.5074,   // default London
+  lng:    -0.1278,
+  date:    new Date(),
+  windKph: 0,
+  cloudPct:0,
+  geoGranted: false,
+  illum:   0,
+  moonAge: 0,
+  distKm:  384400,
+};
+
+// Calendar view
+let calViewYear, calViewMonth;
+
+// ──────────────────────────────────────────────
+// UTILITY: Toast
+// ──────────────────────────────────────────────
+function showToast(msg, duration = 3800) {
+  const c   = document.getElementById('toast-container');
+  const el  = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  c.appendChild(el);
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => el.classList.add('show'));
+  });
+  setTimeout(() => {
+    el.classList.remove('show');
+    setTimeout(() => el.remove(), 380);
+  }, duration);
+}
+
+// ──────────────────────────────────────────────
+// STAR FIELD CANVAS
+// ──────────────────────────────────────────────
+(function initStars() {
+  const canvas = document.getElementById('star-canvas');
+  const ctx    = canvas.getContext('2d');
+  let stars    = [];
+  let W, H;
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+    buildStars();
+  }
+
+  function buildStars() {
+    stars = [];
+    const count = Math.floor((W * H) / 2200);
+    for (let i = 0; i < count; i++) {
+      stars.push({
+        x:   Math.random() * W,
+        y:   Math.random() * H,
+        r:   Math.random() * 1.1 + 0.15,
+        a:   Math.random(),
+        spd: Math.random() * 0.004 + 0.001,
+        off: Math.random() * Math.PI * 2,
+      });
+    }
+  }
+
+  function draw(t) {
+    ctx.clearRect(0, 0, W, H);
+    for (const s of stars) {
+      const alpha = s.a * (0.4 + 0.6 * Math.abs(Math.sin(t * s.spd + s.off)));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(220,215,255,${alpha})`;
+      ctx.fill();
+    }
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+  requestAnimationFrame(draw);
+})();
+
+// ──────────────────────────────────────────────
+// THREE.JS MOON SCENE
+// ──────────────────────────────────────────────
+(function initMoon() {
+  const canvas   = document.getElementById('moon-canvas');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(canvas.parentElement.clientWidth, canvas.parentElement.clientHeight);
+  renderer.shadowMap.enabled = true;
+
+  const scene  = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(42, canvas.parentElement.clientWidth / canvas.parentElement.clientHeight, 0.1, 1000);
+  camera.position.z = 2.8;
+
+  // Texture loader
+  const loader = new THREE.TextureLoader();
+  const moonTex  = loader.load(MOON_TEXTURE_URL);
+  const moonDisp = loader.load(MOON_DISP_URL);
+
+  // Moon mesh
+  const geometry = new THREE.SphereGeometry(1, 64, 64);
+  const material = new THREE.MeshStandardMaterial({
+    map:             moonTex,
+    displacementMap: moonDisp,
+    displacementScale: 0.04,
+    roughness:       0.88,
+    metalness:       0.04,
+  });
+  const moon = new THREE.Mesh(geometry, material);
+  moon.rotation.x = 0.18; // slight tilt for aesthetics
+  scene.add(moon);
+
+  // Ambient light (very dim — space is dark)
+  const ambient = new THREE.AmbientLight(0x1a1030, 0.18);
+  scene.add(ambient);
+
+  // Sun directional light
+  const sunLight = new THREE.DirectionalLight(0xfff8e8, 2.2);
+  sunLight.position.set(5, 0.5, 3);
+  scene.add(sunLight);
+
+  // Expose light for phase updates
+  window._moonSunLight = sunLight;
+
+  // ── Drag rotation ──
+  let isDragging  = false;
+  let lastX, lastY;
+  let velX = 0, velY = 0;
+  const FRICTION = 0.92;
+
+  canvas.addEventListener('mousedown', e => {
+    isDragging = true;
+    lastX = e.clientX; lastY = e.clientY;
+    velX = velY = 0;
+    document.getElementById('drag-hint').style.opacity = '0';
+  });
+  window.addEventListener('mouseup', () => { isDragging = false; });
+  window.addEventListener('mousemove', e => {
+    if (!isDragging) return;
+    const dx = e.clientX - lastX;
+    const dy = e.clientY - lastY;
+    velX = dx * 0.005;
+    velY = dy * 0.005;
+    moon.rotation.y += velX;
+    moon.rotation.x += velY;
+    lastX = e.clientX; lastY = e.clientY;
+  });
+
+  // Touch support
+  let lastTouchX, lastTouchY;
+  canvas.addEventListener('touchstart', e => {
+    isDragging = true;
+    lastTouchX = e.touches[0].clientX;
+    lastTouchY = e.touches[0].clientY;
+    velX = velY = 0;
+  }, { passive: true });
+  canvas.addEventListener('touchmove', e => {
+    if (!isDragging) return;
+    const dx = e.touches[0].clientX - lastTouchX;
+    const dy = e.touches[0].clientY - lastTouchY;
+    velX = dx * 0.005;
+    velY = dy * 0.005;
+    moon.rotation.y += velX;
+    moon.rotation.x += velY;
+    lastTouchX = e.touches[0].clientX;
+    lastTouchY = e.touches[0].clientY;
+  }, { passive: true });
+  canvas.addEventListener('touchend', () => { isDragging = false; });
+
+  // Animate
+  function animate() {
+    requestAnimationFrame(animate);
+    if (!isDragging) {
+      // Gentle inertia + slow auto spin
+      moon.rotation.y += velX;
+      moon.rotation.x += velY;
+      velX *= FRICTION;
+      velY *= FRICTION;
+      moon.rotation.y += 0.0008;
+    }
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  // Resize handler
+  function onResize() {
+    const w = canvas.parentElement.clientWidth;
+    const h = canvas.parentElement.clientHeight;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+  }
+  window.addEventListener('resize', onResize);
+})();
+
+// ──────────────────────────────────────────────
+// PHASE LIGHT POSITION
+// Maps SunCalc phase angle → DirectionalLight XZ position
+// ──────────────────────────────────────────────
+function updateMoonLight(date, lat, lng) {
+  const illum = SunCalc.getMoonIllumination(date);
+  // phase is 0–1 (new→full→new); angle in radians
+  const phaseAngle = illum.phase * Math.PI * 2;
+  // Sun light position (orbit in XZ plane around moon at Y = slight tilt)
+  const radius = 6;
+  const lx = radius * Math.cos(phaseAngle);
+  const lz = radius * Math.sin(phaseAngle);
+  if (window._moonSunLight) {
+    window._moonSunLight.position.set(lx, 0.5, lz);
+  }
+}
+
+// ──────────────────────────────────────────────
+// GAUGE UPDATER
+// ──────────────────────────────────────────────
+const CIRC = 2 * Math.PI * 27; // ≈ 169.65
+
+function setGauge(ringId, centerId, pct) {
+  const ring   = document.getElementById(ringId);
+  const center = document.getElementById(centerId);
+  const offset = CIRC * (1 - Math.min(Math.max(pct, 0), 1));
+  ring.style.strokeDashoffset = offset;
+  center.textContent = Math.round(pct * 100) + '%';
+}
+
+// ──────────────────────────────────────────────
+// PHASE NAME FROM 0-1 FRACTION
+// ──────────────────────────────────────────────
+function getPhaseName(phase) {
+  if (phase < 0.03 || phase > 0.97)  return 'New Moon';
+  if (phase < 0.22)                   return 'Waxing Crescent';
+  if (phase < 0.28)                   return 'First Quarter';
+  if (phase < 0.47)                   return 'Waxing Gibbous';
+  if (phase < 0.53)                   return 'Full Moon';
+  if (phase < 0.72)                   return 'Waning Gibbous';
+  if (phase < 0.78)                   return 'Third Quarter';
+  return 'Waning Crescent';
+}
+
+// ──────────────────────────────────────────────
+// STARGAZING SCORE (0–10)
+// Lower illumination + lower wind + lower clouds = higher score
+// ──────────────────────────────────────────────
+function calcScore(illumPct, windKph, cloudPct) {
+  // Each component 0-1 (lower is better for gazing)
+  const illumScore = 1 - (illumPct / 100);
+  const windScore  = 1 - Math.min(windKph / 60, 1);  // 60 kph = terrible
+  const cloudScore = 1 - (cloudPct / 100);
+  // Weighted sum → 0–10
+  const raw = (illumScore * 0.5 + windScore * 0.25 + cloudScore * 0.25);
+  return (raw * 10);
+}
+
+// ──────────────────────────────────────────────
+// CONDITION GLOW
+// ──────────────────────────────────────────────
+function updateConditionGlow(score, illumPct) {
+  const root   = document.documentElement;
+  const aura   = document.getElementById('moon-aura');
+  const badge  = document.getElementById('condition-badge');
+  const dot    = badge.querySelector('.dot');
+  const text   = document.getElementById('condition-text');
+
+  let glow, soft, label;
+  if (score >= 7 && illumPct < 30) {
+    glow  = 'var(--good-glow)';
+    soft  = 'var(--good-soft)';
+    label = 'Excellent Conditions';
+  } else if (score >= 4) {
+    glow  = 'var(--mid-glow)';
+    soft  = 'var(--mid-soft)';
+    label = 'Moderate Conditions';
+  } else {
+    glow  = 'var(--bad-glow)';
+    soft  = 'var(--bad-soft)';
+    label = 'Poor Conditions';
+  }
+
+  root.style.setProperty('--current-glow', glow);
+  root.style.setProperty('--current-soft', soft);
+  aura.style.background  = `radial-gradient(circle, ${soft} 0%, transparent 70%)`;
+  aura.style.boxShadow   = `0 0 120px 60px ${soft}`;
+  badge.style.color      = glow;
+  dot.style.background   = glow;
+  dot.style.boxShadow    = `0 0 8px ${glow}`;
+  text.textContent       = label;
+}
+
+// ──────────────────────────────────────────────
+// MAIN UI UPDATE
+// ──────────────────────────────────────────────
+function updateUI() {
+  const d    = state.date;
+  const illum = SunCalc.getMoonIllumination(d);
+  const pos   = SunCalc.getMoonPosition(d, state.lat, state.lng);
+
+  // Distance (meters → km)
+  const distKm = Math.round(pos.distance);
+  state.distKm  = distKm;
+  state.illum   = illum.fraction * 100;
+
+  // Moon age (days into synodic cycle)
+  // Reference new moon: Jan 6 2000
+  const REF_NEW_MOON = new Date('2000-01-06T18:14:00Z');
+  const msPerDay = 86400000;
+  const daysSince = (d - REF_NEW_MOON) / msPerDay;
+  const moonAge = ((daysSince % SYNODIC_MONTH) + SYNODIC_MONTH) % SYNODIC_MONTH;
+  state.moonAge = moonAge;
+
+  // Stargazing score
+  const score = calcScore(state.illum, state.windKph, state.cloudPct);
+
+  // Phase bar & name
+  const phaseFrac = illum.phase; // 0–1
+  document.getElementById('phase-bar-fill').style.width      = (phaseFrac * 100) + '%';
+  document.getElementById('phase-bar-thumb').style.left      = `calc(${phaseFrac * 100}% - 7px)`;
+  document.getElementById('phase-name-display').textContent   = getPhaseName(phaseFrac);
+
+  // Gauges
+  setGauge('wind-ring',  'wind-center',  Math.min(state.windKph / 100, 1));
+  setGauge('cloud-ring', 'cloud-center', state.cloudPct / 100);
+  setGauge('illum-ring', 'illum-center', state.illum / 100);
+  document.getElementById('wind-label').textContent  = state.windKph + ' km/h';
+  document.getElementById('cloud-label').textContent = Math.round(state.cloudPct) + '%';
+  document.getElementById('illum-label').textContent = Math.round(state.illum) + '%';
+
+  // Data cells
+  document.getElementById('dc-illum').innerHTML     = Math.round(state.illum) + '<span>%</span>';
+  document.getElementById('dc-illum-sub').textContent = getPhaseName(phaseFrac);
+  document.getElementById('dc-age').innerHTML        = moonAge.toFixed(1) + '<span>d</span>';
+  document.getElementById('dc-age-sub').textContent  = `of ${SYNODIC_MONTH.toFixed(1)} days`;
+  document.getElementById('dc-dist').innerHTML       = distKm.toLocaleString() + '<span> km</span>';
+  document.getElementById('dc-dist-sub').textContent = distKm < SUPERMOON_THRESHOLD
+    ? '✦ Near Perigee — Supermoon!' : distKm > 400000 ? 'Near Apogee' : 'Average distance';
+  document.getElementById('dc-score').innerHTML      = score.toFixed(1) + '<span>/10</span>';
+  document.getElementById('dc-score-sub').textContent = score >= 7 ? 'Prime stargazing' : score >= 4 ? 'Fair conditions' : 'Not ideal tonight';
+
+  // Glow aura
+  updateConditionGlow(score, state.illum);
+
+  // Update 3D lighting
+  updateMoonLight(d, state.lat, state.lng);
+
+  // Weather display
+  document.getElementById('wind-display').textContent  = state.windKph + ' km/h';
+  document.getElementById('cloud-display').textContent = Math.round(state.cloudPct) + '%';
+}
+
+// ──────────────────────────────────────────────
+// UPCOMING EVENTS (next 30 days)
+// ──────────────────────────────────────────────
+function buildUpcomingEvents(fromDate) {
+  const events = [];
+  const msDay  = 86400000;
+  const REF_NM = new Date('2000-01-06T18:14:00Z');
+
+  for (let i = 1; i <= 31; i++) {
+    const d = new Date(fromDate.getTime() + i * msDay);
+    const illum = SunCalc.getMoonIllumination(d);
+    const pos   = SunCalc.getMoonPosition(d, state.lat, state.lng);
+
+    // Full Moon
+    if (illum.fraction >= 0.98 && events.findIndex(e => e.type === 'full') === -1) {
+      events.push({ type: 'full', date: d, dist: Math.round(pos.distance) });
+    }
+    // New Moon
+    if (illum.fraction <= 0.02 && events.findIndex(e => e.type === 'new') === -1) {
+      events.push({ type: 'new', date: d, dist: Math.round(pos.distance) });
+    }
+    // Supermoon (perigee + illumination high)
+    if (pos.distance < SUPERMOON_THRESHOLD && illum.fraction > 0.85 &&
+        events.findIndex(e => e.type === 'super') === -1) {
+      events.push({ type: 'super', date: d, dist: Math.round(pos.distance) });
+    }
+  }
+
+  // ── Build calendar event markers ──
+  updateCalendarEventDots(fromDate, 31);
+
+  // ── Render event list ──
+  const list = document.getElementById('events-list');
+  if (events.length === 0) {
+    list.innerHTML = `<div class="event-item"><span class="event-icon">🌑</span><div class="event-body"><div class="event-title">No major events in next 30 days</div></div></div>`;
+    return;
+  }
+
+  // Sort by date
+  events.sort((a, b) => a.date - b.date);
+
+  list.innerHTML = events.map(ev => {
+    const dateStr = ev.date.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' });
+    const daysAway = Math.round((ev.date - fromDate) / 86400000);
+    let icon, title, badgeCls, badgeLabel;
+
+    if (ev.type === 'full') {
+      icon       = '🌕';
+      title      = ev.dist < SUPERMOON_THRESHOLD ? 'Supermoon — Full Moon' : 'Full Moon';
+      badgeCls   = ev.dist < SUPERMOON_THRESHOLD ? 'badge-super' : 'badge-full';
+      badgeLabel = ev.dist < SUPERMOON_THRESHOLD ? 'Supermoon' : 'Full Moon';
+    } else if (ev.type === 'new') {
+      icon       = '🌑';
+      title      = 'New Moon — Best for Stars';
+      badgeCls   = 'badge-new';
+      badgeLabel = 'Dark Sky';
+    } else {
+      icon       = '🔭';
+      title      = `Perigee — ${ev.dist.toLocaleString()} km`;
+      badgeCls   = 'badge-super';
+      badgeLabel = 'Near Perigee';
+    }
+
+    return `
+      <div class="event-item">
+        <span class="event-icon">${icon}</span>
+        <div class="event-body">
+          <div class="event-title">${title}</div>
+          <div class="event-date">${dateStr} · in ${daysAway} day${daysAway !== 1 ? 's' : ''}</div>
+        </div>
+        <span class="event-badge ${badgeCls}">${badgeLabel}</span>
+      </div>`;
+  }).join('');
+}
+
+// Store event dates for calendar dots
+let eventDates = new Set();
+function updateCalendarEventDots(fromDate, days) {
+  eventDates.clear();
+  const msDay = 86400000;
+  for (let i = 1; i <= days; i++) {
+    const d = new Date(fromDate.getTime() + i * msDay);
+    const illum = SunCalc.getMoonIllumination(d);
+    const pos   = SunCalc.getMoonPosition(d, state.lat, state.lng);
+    if (illum.fraction >= 0.98 || illum.fraction <= 0.02 ||
+        (pos.distance < SUPERMOON_THRESHOLD && illum.fraction > 0.85)) {
+      eventDates.add(d.toDateString());
+    }
+  }
+}
+
+// ──────────────────────────────────────────────
+// CUSTOM CALENDAR
+// ──────────────────────────────────────────────
+const MONTHS = ['January','February','March','April','May','June',
+                'July','August','September','October','November','December'];
+
+function initCalendar() {
+  const today = new Date();
+  calViewYear  = today.getFullYear();
+  calViewMonth = today.getMonth();
+  renderCalendar();
+
+  document.getElementById('cal-prev').addEventListener('click', () => {
+    calViewMonth--;
+    if (calViewMonth < 0) { calViewMonth = 11; calViewYear--; }
+    renderCalendar();
+  });
+  document.getElementById('cal-next').addEventListener('click', () => {
+    calViewMonth++;
+    if (calViewMonth > 11) { calViewMonth = 0; calViewYear++; }
+    renderCalendar();
+  });
+}
+
+function renderCalendar() {
+  document.getElementById('cal-month-label').textContent = `${MONTHS[calViewMonth]} ${calViewYear}`;
+  const grid    = document.getElementById('cal-grid');
+  const today   = new Date();
+  const firstDay = new Date(calViewYear, calViewMonth, 1).getDay(); // 0=Sun
+  const daysInMonth = new Date(calViewYear, calViewMonth + 1, 0).getDate();
+
+  let html = '';
+  // Blank cells before first day
+  for (let i = 0; i < firstDay; i++) {
+    html += `<div class="cal-day empty"></div>`;
+  }
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const d = new Date(calViewYear, calViewMonth, day);
+    const isToday    = d.toDateString() === today.toDateString();
+    const isSelected = d.toDateString() === state.date.toDateString();
+    const hasEvent   = eventDates.has(d.toDateString());
+    const classes    = ['cal-day',
+      isToday    ? 'today'    : '',
+      isSelected ? 'selected' : '',
+      hasEvent   ? 'has-event': '',
+    ].filter(Boolean).join(' ');
+
+    html += `<div class="${classes}" data-day="${day}" data-month="${calViewMonth}" data-year="${calViewYear}">${day}</div>`;
+  }
+
+  grid.innerHTML = html;
+
+  // Attach click events
+  grid.querySelectorAll('.cal-day:not(.empty)').forEach(el => {
+    el.addEventListener('click', () => {
+      const y = parseInt(el.dataset.year);
+      const m = parseInt(el.dataset.month);
+      const d = parseInt(el.dataset.day);
+      state.date = new Date(y, m, d, 12, 0, 0);
+      renderCalendar();
+      updateUI();
+      buildUpcomingEvents(state.date);
+    });
+  });
+}
+
+// ──────────────────────────────────────────────
+// OPEN-METEO WEATHER FETCH
+// ──────────────────────────────────────────────
+async function fetchWeather(lat, lng) {
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(4)}&longitude=${lng.toFixed(4)}&current_weather=true&hourly=cloudcover,windspeed_10m&forecast_days=1&timezone=auto`;
+  try {
+    const res  = await fetch(url);
+    const data = await res.json();
+
+    // Wind from current_weather (km/h)
+    const windKph = data.current_weather?.windspeed ?? 0;
+
+    // Cloud cover: get current hour index
+    const nowHour = new Date().getHours();
+    const clouds   = data.hourly?.cloudcover?.[nowHour] ?? 50;
+
+    state.windKph  = Math.round(windKph);
+    state.cloudPct = clouds;
+    updateUI();
+  } catch (err) {
+    console.warn('Weather fetch failed:', err);
+    showToast('⚠️ Weather data unavailable — using defaults');
+    state.windKph  = 15;
+    state.cloudPct = 40;
+    updateUI();
+  }
+}
+
+// ──────────────────────────────────────────────
+// GEOLOCATION
+// ──────────────────────────────────────────────
+function startGeolocation() {
+  if (!navigator.geolocation) {
+    showToast('📍 Geolocation not supported — Using London');
+    fetchWeather(state.lat, state.lng);
+    document.getElementById('location-text').textContent = 'London, UK (default)';
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      state.lat      = pos.coords.latitude;
+      state.lng      = pos.coords.longitude;
+      state.geoGranted = true;
+
+      // Reverse geocode via Open-Meteo timezone data (rough, no API key needed)
+      fetchCityName(state.lat, state.lng);
+      fetchWeather(state.lat, state.lng);
+      updateUI();
+    },
+    err => {
+      console.warn('Geo denied:', err);
+      showToast('📍 Location denied — Using London, UK');
+      document.getElementById('location-text').textContent = 'London, UK (default)';
+      fetchWeather(state.lat, state.lng);
+      updateUI();
+    },
+    { timeout: 8000 }
+  );
+}
+
+async function fetchCityName(lat, lng) {
+  // Use Open-Meteo's geocoding to get a timezone label for display
+  try {
+    const url  = `https://geocoding-api.open-meteo.com/v1/search?name=&latitude=${lat.toFixed(3)}&longitude=${lng.toFixed(3)}&count=0`;
+    // Open-Meteo doesn't support reverse, so use a simple lat/lng display
+    document.getElementById('location-text').textContent =
+      `${lat.toFixed(3)}°N, ${lng.toFixed(3)}°E (your location)`;
+  } catch {
+    document.getElementById('location-text').textContent =
+      `${lat.toFixed(3)}°, ${lng.toFixed(3)}°`;
+  }
+}
+
+document.getElementById('refresh-loc').addEventListener('click', () => {
+  document.getElementById('location-text').textContent = 'Acquiring…';
+  startGeolocation();
+});
+
+// ──────────────────────────────────────────────
+// BOOT
+// ──────────────────────────────────────────────
+(function boot() {
+  // Set today's date
+  const today = new Date();
+  state.date  = today;
+
+  // Initialise calendar
+  initCalendar();
+
+  // First render of UI (with defaults)
+  updateUI();
+
+  // Compute upcoming events
+  buildUpcomingEvents(today);
+
+  // Ask for geolocation + weather
+  startGeolocation();
+
+  // Welcome toast
+  setTimeout(() => {
+    showToast('🌙 Lunara — Look up. The sky is waiting.');
+  }, 900);
+})();
+</script>
+</body>
+</html>
