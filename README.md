@@ -6,6 +6,8 @@ Akash Khoj is a system being developed to help people find optimal conditions fo
 
 Its purpose is to simplify the process of finding good observation spots by consolidating information currently scattered across multiple sources. Essentially, it's a tool designed to make astronomy more accessible by providing easy access to relevant environmental data. As well as giving information about the cosmos to the user by Galileo AI (A locally run LLM Chat Bot) which would help you solve your questions.
 
+<br>
+
 <h1>😇 Technologies</h1>
 
 <h2><b> → Languages </b></h2>
@@ -35,6 +37,8 @@ Its purpose is to simplify the process of finding good observation spots by cons
 - **Browser Geolocation API** — Built-in browser feature that gets a user's GPS coordinates (with permission).
 - **n8n Webhook** — Automation endpoint that receives data and triggers workflows (e.g., for a chatbot backend like Galileo AI).
 
+<br>
+
 <h1>🤩 Features</h1> 
 
 The main features of my Project is the **Scroll-Driven Animation** which the main page of Akash khoj uses. *How it works* - At its core, the entire background is a 36-frame space sequence rendered on an HTML5 Canvas — you literally control the cinematic by scrolling. Scroll slowly and the space scene drifts gently; scroll fast and it rushes past. The page preloads all 36 frames before revealing itself, so the experience is always completely smooth.
@@ -45,14 +49,19 @@ The other aspects of this are as follows:
 
 An interactive 3D moon visualization app that shows the exact lunar phase and lighting for any selected date, along with live weather data to calculate a stargazing score based on moon brightness, wind, and cloud coverage. It also includes a calendar, circular weather gauges, and upcoming lunar events like Full Moons and Supermoons.
 
+<br>
+
 2) **Nebula Air Index (NAI)**
 
 A real-time air quality monitoring dashboard that automatically detects your location and displays your city’s AQI instantly, alongside live AQI data from 12 major global cities. It uses a six-tier international scale (Good to Hazardous) and presents the information in a visually immersive space-themed interface.
+
+<br>
 
 3) **Hermes HandBook**
 
 A virtual astronomy codex designed as an interactive 3D flipbook that mimics an ancient Roman manuscript, complete with Latin headings, classical typography, and atmospheric candlelit visuals. It delivers educational content about stars, constellations, and planets through an immersive, book-like reading experience.
 
+<br>
 
 <h1>👨‍💻 The Process</h1>
 
@@ -64,9 +73,13 @@ Also there a was a small competition in the college for presenting everyones pro
 
 Which is why, **Akash Khoj** is avaiable to everyone for showcasing my learnings which i had along the way.
 
+<br>
+
 <h1>📈 Overall Growth</h1>
 
 I have grown significantly with each part of this project helped me understand more about building apps, managing complex information and improving user experience. It was more than just making an app, it was about solving problems, learning new things and improving my skills for the future work.
+
+<br>
 
 <h1>🚦 Running the Project</h1>
 
@@ -76,3 +89,4 @@ To run the project in your local environment, follow these steps:
 2. Download "`Live Server`" extension from Extensions in Visual Studio Code for easily executing the code.
 3. Now open the ```akash khoj``` folder in that run the ```index.html``` file and enjoy the exploration.
 
+<br>
