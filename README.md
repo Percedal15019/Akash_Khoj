@@ -43,6 +43,8 @@ Its purpose is to simplify the process of finding good observation spots by cons
 
 The main features of my Project is the **Scroll-Driven Animation** which the main page of Akash khoj uses. *How it works* - At its core, the entire background is a 36-frame space sequence rendered on an HTML5 Canvas — you literally control the cinematic by scrolling. Scroll slowly and the space scene drifts gently; scroll fast and it rushes past. The page preloads all 36 frames before revealing itself, so the experience is always completely smooth.
 
+<br>
+
 The other aspects of this are as follows: 
 
 1) **Lunara — Moon Phase Tracker**
