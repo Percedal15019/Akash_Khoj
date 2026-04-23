@@ -8,7 +8,7 @@ Its purpose is to simplify the process of finding good observation spots by cons
 
 <h1>😇 Technologies</h1>
 
-<h2> → **Languages** </h2>
+<h2><b> → Languages </b></h2>
 - **HTML5** — The standard markup language used to structure web pages and web apps.
 - **CSS3** — Styling language used to design layouts, animations, and responsiveness of websites.
 - **JavaScript ES6+** — Modern JavaScript version with advanced features like arrow functions, modules, and async/await.
