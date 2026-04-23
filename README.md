@@ -65,6 +65,10 @@ A virtual astronomy codex designed as an interactive 3D flipbook that mimics an 
 
 <br>
 
+4) **Galileo AI**
+
+
+
 <h1>👨‍💻 The Process</h1>
 
 This idea was originated by my friend. He and I were jogging in the evening and i asked him about what project should i do next. And he suggested me to build "Akash Khoj" which would help me and him to monitor the weather as well as light level condition of our surroundings. So he has a contribution to this idea whatsoever.
