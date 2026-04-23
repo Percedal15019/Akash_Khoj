@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="en" class="antialiased">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akash Khoj</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Playfair+Display:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- GSAP & Plugins -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+
+    <!-- Lenis Smooth Scroll -->
+    <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #f5f5f5;
+            overflow-x: hidden;
+            margin: 0;
+        }
+
+        .font-serif {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .font-sans {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Fixed Canvas Background */
+        #video-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+            object-fit: cover;
+            pointer-events: none;
+        }
+
+        .content-layer {
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Loading Spinner */
+        #loader {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: #1a1a1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 1rem;
+            transition: opacity 0.5s ease-out;
+        }
+
+        /* HUD Centering */
+        #info-overlay {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #info-overlay>div {
+            width: 100rem;
+            height: 54rem;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #1ad3d9;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .hero-title {
+            font-size: clamp(8rem, 17vw, 9rem);
+            height: 52rem;
+            letter-spacing: -0.1em;
+            right: 12em;
+            left: 80rem;
+            font-weight: 500;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .marker {
+            position: absolute;
+            background: red;
+            height: 2px;
+            width: 100%;
+            z-index: 999;
+            display: none;
+        }
+
+        /* ══════════════════════════════════════════
+           HOME BUTTON
+        ══════════════════════════════════════════ */
+        #home-btn {
+            position: fixed;
+            top: 24px;
+            left: 24px;
+            z-index: 9000;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 10px 18px 10px 14px;
+            border-radius: 50px;
+            background: rgba(10, 12, 24, 0.55);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(26, 211, 217, 0.18);
+            color: rgba(26, 211, 217, 0.85);
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(-8px);
+            transition:
+                background 0.25s ease,
+                border-color 0.25s ease,
+                color 0.25s ease,
+                box-shadow 0.3s ease,
+                transform 0.2s ease;
+            box-shadow: 0 0 0 rgba(26, 211, 217, 0);
+        }
+
+        #home-btn.visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        #home-btn:hover {
+            background: rgba(26, 211, 217, 0.1);
+            border-color: rgba(26, 211, 217, 0.5);
+            color: #1ad3d9;
+            box-shadow: 0 0 22px rgba(26, 211, 217, 0.25);
+            transform: translateY(-2px);
+        }
+
+        #home-btn:active {
+            transform: translateY(0) scale(0.97);
+        }
+
+        #home-btn svg {
+            width: 15px;
+            height: 15px;
+            flex-shrink: 0;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        #home-btn:hover svg {
+            transform: rotate(-15deg) scale(1.15);
+        }
+
+        /* ══════════════════════════════════════════
+           PORTAL CARD ENHANCEMENTS
+        ══════════════════════════════════════════ */
+        .portal-card {
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 0.4s ease,
+                border-color 0.3s ease;
+            border: 1px solid rgba(26, 211, 217, 0.08);
+        }
+
+        .portal-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 0%, rgba(26, 211, 217, 0.12) 0%, transparent 65%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: 0;
+        }
+
+        .portal-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #1ad3d9, transparent);
+            transform: scaleX(0);
+            transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .portal-card:hover::before {
+            opacity: 1;
+        }
+
+        .portal-card:hover::after {
+            transform: scaleX(1);
+        }
+
+        .portal-card:hover {
+            transform: translateY(-8px) scale(1.03);
+            box-shadow: 0 20px 60px rgba(26, 211, 217, 0.2), 0 0 0 1px rgba(26, 211, 217, 0.2);
+            border-color: rgba(26, 211, 217, 0.25);
+        }
+
+        .portal-card:active {
+            transform: translateY(-4px) scale(0.99);
+        }
+
+        .portal-icon-wrap {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .portal-icon-wrap i {
+            width: 3.5rem;
+            height: 3.5rem;
+            color: #1ad3d9;
+            filter: drop-shadow(0 0 12px rgba(26, 211, 217, 0.5));
+            transition: filter 0.3s ease, color 0.3s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .portal-card:hover .portal-icon-wrap i {
+            color: #fff;
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.6));
+            transform: scale(1.15) rotate(-5deg);
+        }
+
+        .portal-title {
+            position: relative;
+            z-index: 1;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.25rem;
+            color: #fff;
+            margin-bottom: 0.4rem;
+            transition: color 0.3s ease;
+        }
+
+        .portal-sub {
+            position: relative;
+            z-index: 1;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.7rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.45);
+            transition: color 0.3s ease;
+        }
+
+        .portal-card:hover .portal-sub {
+            color: rgba(26, 211, 217, 0.8);
+        }
+
+        .portal-cta {
+            position: relative;
+            z-index: 1;
+            margin-top: 1.2rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.65rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: rgba(26, 211, 217, 0.6);
+            opacity: 0;
+            transform: translateY(6px);
+            transition: opacity 0.3s ease, transform 0.3s ease, color 0.3s ease;
+        }
+
+        .portal-cta svg {
+            width: 10px;
+            height: 10px;
+        }
+
+        .portal-card:hover .portal-cta {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ══════════════════════════════════════════
+           CINEMATIC MODAL SYSTEM
+        ══════════════════════════════════════════ */
+        #portal-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        /* Dark radial backdrop */
+        #modal-backdrop {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at center, rgba(0, 8, 20, 0.97) 0%, rgba(0, 0, 0, 0.99) 100%);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            opacity: 0;
+        }
+
+        /* Animated border ring that appears on open */
+        #modal-ring {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        #modal-ring::before,
+        #modal-ring::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            border-radius: 50%;
+            border: 1px solid rgba(26, 211, 217, 0.3);
+            animation: none;
+        }
+
+        #portal-modal.open #modal-ring::before {
+            width: 140vmax;
+            height: 140vmax;
+            animation: ring-expand 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        #portal-modal.open #modal-ring::after {
+            width: 110vmax;
+            height: 110vmax;
+            animation: ring-expand 0.9s 0.06s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            border-color: rgba(26, 211, 217, 0.12);
+        }
+
+        @keyframes ring-expand {
+            to {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0;
+            }
+        }
+
+        /* Content shell */
+        #modal-shell {
+            position: relative;
+            width: calc(100vw - 48px);
+            height: calc(100vh - 48px);
+            border-radius: 16px;
+            overflow: hidden;
+            transform: scale(0.88) translateY(30px);
+            opacity: 0;
+            border: 1px solid rgba(26, 211, 217, 0.15);
+            box-shadow: 0 0 0 1px rgba(26, 211, 217, 0.06),
+                0 40px 100px rgba(0, 0, 0, 0.8),
+                inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        }
+
+        /* Top chrome bar */
+        #modal-chrome {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 52px;
+            background: rgba(5, 8, 18, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(26, 211, 217, 0.1);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 10;
+            gap: 16px;
+        }
+
+        /* Traffic lights */
+        .chrome-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .chrome-dot-r {
+            background: #ff5f57;
+            box-shadow: 0 0 6px rgba(255, 95, 87, 0.5);
+            cursor: pointer;
+        }
+
+        .chrome-dot-y {
+            background: #febc2e;
+            box-shadow: 0 0 6px rgba(254, 188, 46, 0.4);
+        }
+
+        .chrome-dot-g {
+            background: #28c840;
+            box-shadow: 0 0 6px rgba(40, 200, 64, 0.4);
+        }
+
+        .chrome-dot-r:hover {
+            background: #ff3b30;
+            filter: brightness(1.2);
+        }
+
+        #modal-app-name {
+            flex: 1;
+            text-align: center;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.35);
+        }
+
+        #modal-close-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(26, 211, 217, 0.2);
+            background: rgba(26, 211, 217, 0.05);
+            color: rgba(26, 211, 217, 0.8);
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.2s;
+            flex-shrink: 0;
+        }
+
+        #modal-close-btn:hover {
+            background: rgba(26, 211, 217, 0.12);
+            border-color: rgba(26, 211, 217, 0.5);
+            color: #1ad3d9;
+            transform: scale(1.04);
+        }
+
+        #modal-close-btn svg {
+            width: 12px;
+            height: 12px;
+        }
+
+        /* Progress bar in chrome */
+        #modal-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #1ad3d9, #7c5cbf);
+            width: 0%;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 8px rgba(26, 211, 217, 0.8);
+        }
+
+        /* iFrame */
+        #modal-iframe {
+            position: absolute;
+            top: 52px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: calc(100% - 52px);
+            border: none;
+            background: #000;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        /* Loading overlay inside modal */
+        #modal-loader {
+            position: absolute;
+            top: 52px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #020508;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            z-index: 5;
+            transition: opacity 0.5s ease;
+        }
+
+        .modal-loader-ring {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            border: 2px solid rgba(26, 211, 217, 0.1);
+            border-top-color: #1ad3d9;
+            border-right-color: rgba(26, 211, 217, 0.4);
+            animation: spin 0.9s linear infinite;
+            box-shadow: 0 0 20px rgba(26, 211, 217, 0.3);
+        }
+
+        .modal-loader-label {
+            font-family: 'Inter', sans-serif;
+            font-size: 10px;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: rgba(26, 211, 217, 0.5);
+        }
+
+        .modal-loader-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: -8px;
+        }
+
+        /* Scan-line overlay (cinematic feel) */
+        #modal-shell::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(0deg,
+                    transparent,
+                    transparent 3px,
+                    rgba(0, 0, 0, 0.035) 3px,
+                    rgba(0, 0, 0, 0.035) 4px);
+            pointer-events: none;
+            z-index: 20;
+            opacity: 0.5;
+        }
+
+        /* Corner accent decorations */
+        .modal-corner {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-color: rgba(26, 211, 217, 0.4);
+            border-style: solid;
+            z-index: 15;
+            pointer-events: none;
+        }
+
+        .modal-corner-tl {
+            top: 52px;
+            left: 0;
+            border-width: 1px 0 0 1px;
+            border-radius: 16px 0 0 0;
+        }
+
+        .modal-corner-tr {
+            top: 52px;
+            right: 0;
+            border-width: 1px 1px 0 0;
+            border-radius: 0 16px 0 0;
+        }
+
+        .modal-corner-bl {
+            bottom: 0;
+            left: 0;
+            border-width: 0 0 1px 1px;
+            border-radius: 0 0 0 16px;
+        }
+
+        .modal-corner-br {
+            bottom: 0;
+            right: 0;
+            border-width: 0 1px 1px 0;
+            border-radius: 0 0 16px 0;
+        }
+
+        /* ══════════════════════════════════════════
+           PORTAL SPARK PARTICLES
+        ══════════════════════════════════════════ */
+        #spark-canvas {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 99998;
+            opacity: 0;
+        }
+
+        /* ══════════════════════════════════════════
+           KEYBOARD HINT
+        ══════════════════════════════════════════ */
+        #esc-hint {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Inter', sans-serif;
+            font-size: 10px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        #esc-hint kbd {
+            padding: 2px 7px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 4px;
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Loading Screen -->
+    <div id="loader">
+        <div class="spinner"></div>
+        <div class="font-sans text-sm tracking-widest text-gray-400">LOADING EXPERIENCE</div>
+    </div>
+
+    <!-- Home Button -->
+    <button id="home-btn" aria-label="Scroll to top">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9.5z" />
+            <polyline points="9 21 9 13 15 13 15 21" />
+        </svg>
+        Home
+    </button>
+
+    <!-- Background Canvas -->
+    <canvas id="video-canvas"></canvas>
+
+    <!-- Spark particle canvas -->
+    <canvas id="spark-canvas"></canvas>
+
+    <!-- Scroll Container -->
+    <div class="scroll-track relative w-full" style="height: 800vh;">
+
+        <!-- Hero Section -->
+        <div class="fixed inset-0 z-10 flex flex-col items-center justify-center text-center pointer-events-none p-4">
+            <h1 id="brand-title" class="hero-title font-serif text-white mb-4 tracking-tighter opacity-90">
+                Akash Khoj
+            </h1>
+            <p id="brand-subtitle" class="font-sans text-[#1ad3d9] text-xl md:text-2xl tracking-[0.45em] opacity-100">
+                IMMERSIVE EXPLORATION
+            </p>
+        </div>
+
+    </div>
+
+
+    <!-- HUD / Info Overlay (Hidden by default) -->
+    <div id="info-overlay" class="fixed bottom-12 left-0 w-full z-50 pointer-events-none opacity-0">
+        <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-center items-center gap-6">
+
+            <!-- Card 1 — Moon's Rhythm -->
+            <div class="portal-card glass-card p-10 rounded-xl text-center pointer-events-auto"
+                style="min-width: 220px;" data-app="moon" data-src="../lunar/lunar.html"
+                data-label="Lunara · Moon Phase">
+                <div class="portal-icon-wrap">
+                    <i data-lucide="moon"></i>
+                </div>
+                <h3 class="portal-title">Moon's Rhythm</h3>
+                <p class="portal-sub">Lunar Status</p>
+                <div class="portal-cta">
+                    Enter
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Card 2 — Nebula Air Index -->
+            <div class="portal-card glass-card p-10 rounded-xl text-center pointer-events-auto"
+                style="min-width: 220px;" data-app="nebula" data-src="../nai/nai.html" data-label="Nebula · Air Index">
+                <div class="portal-icon-wrap">
+                    <i data-lucide="wind"></i>
+                </div>
+                <h3 class="portal-title">Nebula Air Index</h3>
+                <p class="portal-sub">Breathing Through Darkness</p>
+                <div class="portal-cta">
+                    Enter
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Card 3 — Hermes HandBook -->
+            <div class="portal-card glass-card p-10 rounded-xl text-center pointer-events-auto"
+                style="min-width: 220px;" data-app="hermes" data-src="../hermes/hermes.html"
+                data-label="Hermes · HandBook">
+                <div class="portal-icon-wrap">
+                    <i data-lucide="book-open"></i>
+                </div>
+                <h3 class="portal-title">Hermes' HandBook</h3>
+                <p class="portal-sub">Guide Of The Galaxy</p>
+                <div class="portal-cta">
+                    Enter
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer
+        class="content-layer relative z-20 w-full min-h-screen flex items-center justify-center bg-black/80 backdrop-blur-md">
+        <div class="glass-card p-12 max-w-2xl text-center rounded-2xl mx-4">
+            <i data-lucide="compass" class="w-12 h-12 text-[#1ad3d9] mx-auto mb-6"></i>
+            <h2 class="font-serif text-4xl mb-6">The Journey Continues</h2>
+            <p class="font-sans text-gray-400 leading-relaxed mb-8">
+                Explore the depths of the universe through our curated visual experiences.
+                Every frame tells a story of discovery and wonder.
+            </p>
+            <button
+                class="px-8 py-3 bg-[#1ad3d9] text-black font-bold rounded-full hover:bg-white transition-colors duration-300">
+                Start Expedition
+            </button>
+        </div>
+    </footer>
+
+
+    <!-- ══════════════════════════════════════════════════════
+         CINEMATIC PORTAL MODAL
+    ══════════════════════════════════════════════════════ -->
+    <div id="portal-modal">
+        <div id="modal-backdrop"></div>
+        <div id="modal-ring"></div>
+
+        <div id="modal-shell">
+            <!-- Corner accents -->
+            <div class="modal-corner modal-corner-tl"></div>
+            <div class="modal-corner modal-corner-tr"></div>
+            <div class="modal-corner modal-corner-bl"></div>
+            <div class="modal-corner modal-corner-br"></div>
+
+            <!-- Chrome top bar -->
+            <div id="modal-chrome">
+                <div class="chrome-dot chrome-dot-r" id="modal-close-dot" title="Close"></div>
+                <div class="chrome-dot chrome-dot-y"></div>
+                <div class="chrome-dot chrome-dot-g"></div>
+                <div id="modal-app-name">—</div>
+                <button id="modal-close-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                    EXIT PORTAL
+                </button>
+                <div id="modal-progress"></div>
+            </div>
+
+            <!-- Loading overlay -->
+            <div id="modal-loader">
+                <div class="modal-loader-name" id="modal-loader-name">—</div>
+                <div class="modal-loader-ring"></div>
+                <div class="modal-loader-label">INITIALISING PORTAL</div>
+            </div>
+
+            <!-- The actual iframe -->
+            <iframe id="modal-iframe" src="" allow="geolocation"></iframe>
+
+            <!-- ESC hint -->
+            <div id="esc-hint">
+                <kbd>ESC</kbd> to close portal
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  MAIN APP CONFIG
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        const CONFIG = {
+            frameCount: 36,
+            framePath: (i) => `./Frames/OtherFrames/scene${String(i).padStart(5, '0')}.png`,
+            accentColor: '#1ad3d9'
+        };
+
+        const canvas = document.getElementById('video-canvas');
+        const context = canvas.getContext('2d');
+        const loader = document.getElementById('loader');
+        const brandTitle = document.getElementById('brand-title');
+        const brandSubtitle = document.getElementById('brand-subtitle');
+        const frames = [];
+        const state = { frame: 0 };
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  SPARK PARTICLE SYSTEM
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        const sparkCanvasEl = document.getElementById('spark-canvas');
+        const sparkCtx = sparkCanvasEl.getContext('2d');
+        let sparks = [];
+        let sparkActive = false;
+        let sparkRaf;
+
+        function resizeSpark() {
+            sparkCanvasEl.width = window.innerWidth;
+            sparkCanvasEl.height = window.innerHeight;
+        }
+        resizeSpark();
+        window.addEventListener('resize', resizeSpark);
+
+        function burstSparks(cx, cy, count = 60) {
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 2 + Math.random() * 9;
+                const size = 1.5 + Math.random() * 3;
+                const life = 0.6 + Math.random() * 0.8;
+                sparks.push({
+                    x: cx, y: cy,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    size, life, maxLife: life,
+                    hue: 180 + Math.random() * 40
+                });
+            }
+            if (!sparkActive) animateSparks();
+        }
+
+        function animateSparks() {
+            sparkActive = true;
+            sparkCtx.clearRect(0, 0, sparkCanvasEl.width, sparkCanvasEl.height);
+            sparks = sparks.filter(s => s.life > 0);
+            sparks.forEach(s => {
+                s.x += s.vx;
+                s.y += s.vy;
+                s.vx *= 0.93;
+                s.vy *= 0.93;
+                s.vy += 0.12; // gravity
+                s.life -= 0.025;
+                const alpha = Math.max(0, s.life / s.maxLife);
+                sparkCtx.beginPath();
+                sparkCtx.arc(s.x, s.y, s.size * alpha, 0, Math.PI * 2);
+                sparkCtx.fillStyle = `hsla(${s.hue}, 100%, 70%, ${alpha})`;
+                sparkCtx.shadowBlur = 8;
+                sparkCtx.shadowColor = `hsla(${s.hue}, 100%, 70%, ${alpha * 0.6})`;
+                sparkCtx.fill();
+                sparkCtx.shadowBlur = 0;
+            });
+            if (sparks.length > 0) {
+                sparkRaf = requestAnimationFrame(animateSparks);
+            } else {
+                sparkActive = false;
+                gsap.to(sparkCanvasEl, { opacity: 0, duration: 0.4 });
+            }
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  MODAL SYSTEM
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        const modal = document.getElementById('portal-modal');
+        const backdrop = document.getElementById('modal-backdrop');
+        const modalShell = document.getElementById('modal-shell');
+        const modalIframe = document.getElementById('modal-iframe');
+        const modalLoader = document.getElementById('modal-loader');
+        const modalName = document.getElementById('modal-app-name');
+        const loaderName = document.getElementById('modal-loader-name');
+        const closeBtn = document.getElementById('modal-close-btn');
+        const closeDot = document.getElementById('modal-close-dot');
+        const progressBar = document.getElementById('modal-progress');
+        let modalOpen = false;
+
+        function openPortal(card) {
+            if (modalOpen) return;
+            modalOpen = true;
+
+            const src = card.dataset.src;
+            const label = card.dataset.label;
+
+            // Burst sparks from card center
+            const rect = card.getBoundingClientRect();
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+            gsap.to(sparkCanvasEl, { opacity: 1, duration: 0.1 });
+            burstSparks(cx, cy, 80);
+
+            // Reset iframe & loader
+            modalIframe.src = '';
+            modalIframe.style.opacity = '0';
+            modalLoader.style.opacity = '1';
+            modalLoader.style.display = 'flex';
+            progressBar.style.width = '0%';
+            modalName.textContent = label;
+            loaderName.textContent = label.split('·')[0].trim();
+
+            // Make modal visible
+            modal.style.visibility = 'visible';
+            modal.style.pointerEvents = 'auto';
+            modal.classList.add('open');
+
+            // Animate in — timeline
+            const tl = gsap.timeline();
+            tl.to(backdrop, { opacity: 1, duration: 0.35, ease: 'power2.out' })
+                .to(modalShell, {
+                    opacity: 1,
+                    scale: 1,
+                    y: 0,
+                    duration: 0.6,
+                    ease: 'expo.out'
+                }, '-=0.15')
+                .to(progressBar, { width: '35%', duration: 0.8, ease: 'power1.out' }, '-=0.4');
+
+            // Load iframe after shell is visible
+            setTimeout(() => {
+                modalIframe.src = src;
+                tl.to(progressBar, { width: '75%', duration: 1, ease: 'power1.out' });
+            }, 300);
+
+            modalIframe.onload = () => {
+                gsap.to(progressBar, { width: '100%', duration: 0.3, ease: 'power2.out' });
+                setTimeout(() => {
+                    gsap.to(modalLoader, { opacity: 0, duration: 0.4, onComplete: () => { modalLoader.style.display = 'none'; } });
+                    gsap.to(modalIframe, { opacity: 1, duration: 0.5 });
+                    gsap.to(progressBar, { opacity: 0, duration: 0.5, delay: 0.3 });
+                }, 300);
+            };
+        }
+
+        function closePortal() {
+            if (!modalOpen) return;
+            modalOpen = false;
+            modal.classList.remove('open');
+
+            const tl = gsap.timeline({
+                onComplete: () => {
+                    modal.style.visibility = 'hidden';
+                    modal.style.pointerEvents = 'none';
+                    modalIframe.src = '';
+                    progressBar.style.opacity = '1';
+                    progressBar.style.width = '0%';
+                    modalLoader.style.display = 'flex';
+                    modalLoader.style.opacity = '1';
+                }
+            });
+            tl.to(modalShell, { opacity: 0, scale: 0.93, y: 20, duration: 0.4, ease: 'power3.in' })
+                .to(backdrop, { opacity: 0, duration: 0.3, ease: 'power2.in' }, '-=0.2');
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  BIND PORTAL CARDS
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        function bindPortalCards() {
+            document.querySelectorAll('.portal-card').forEach(card => {
+                card.addEventListener('click', () => openPortal(card));
+
+                // Magnetic hover effect
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const mx = (e.clientX - rect.left - rect.width / 2) / (rect.width / 2);
+                    const my = (e.clientY - rect.top - rect.height / 2) / (rect.height / 2);
+                    gsap.to(card, {
+                        rotateY: mx * 6,
+                        rotateX: -my * 4,
+                        duration: 0.5,
+                        ease: 'power2.out',
+                        transformPerspective: 800
+                    });
+                });
+                card.addEventListener('mouseleave', () => {
+                    gsap.to(card, { rotateY: 0, rotateX: 0, duration: 0.6, ease: 'elastic.out(1,0.8)' });
+                });
+            });
+
+            closeBtn.addEventListener('click', closePortal);
+            closeDot.addEventListener('click', closePortal);
+            backdrop.addEventListener('click', closePortal);
+        }
+
+        // ESC key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modalOpen) closePortal();
+        });
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  SCROLL-DRIVEN FRAME ANIMATION
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        async function init() {
+            gsap.registerPlugin(ScrollTrigger);
+            lucide.createIcons();
+
+            const lenis = new Lenis({
+                duration: 1.2,
+                easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                direction: 'vertical', gestureDirection: 'vertical',
+                smooth: true, mouseMultiplier: 1,
+                smoothTouch: false, touchMultiplier: 2,
+            });
+            lenis.on('scroll', ScrollTrigger.update);
+            gsap.ticker.add((time) => { lenis.raf(time * 1000); });
+            gsap.ticker.lagSmoothing(0);
+
+            await preloadImages();
+            setupCanvas();
+            setupAnimations();
+            bindPortalCards();
+            setupHomeButton(lenis);
+
+            gsap.to(loader, { opacity: 0, duration: 0.5, onComplete: () => loader.style.display = 'none' });
+            renderFrame();
+        }
+
+        function preloadImages() {
+            const promises = [];
+            for (let i = 1; i <= CONFIG.frameCount; i++) {
+                promises.push(new Promise((resolve) => {
+                    const img = new Image();
+                    img.src = CONFIG.framePath(i);
+                    img.onload = () => { frames.push(img); resolve(); };
+                    img.onerror = () => { console.warn(`⚠️ Frame missing: ${CONFIG.framePath(i)}`); resolve(); };
+                }));
+            }
+            return Promise.all(promises).then(() => {
+                frames.sort((a, b) => {
+                    const an = parseInt(a.src.match(/scene(\d+)/)[1]);
+                    const bn = parseInt(b.src.match(/scene(\d+)/)[1]);
+                    return an - bn;
+                });
+            });
+        }
+
+        function setupCanvas() {
+            const resize = () => {
+                const dpr = window.devicePixelRatio || 1;
+                canvas.width = window.innerWidth * dpr;
+                canvas.height = window.innerHeight * dpr;
+                context.scale(dpr, dpr);
+                canvas.style.width = `${window.innerWidth}px`;
+                canvas.style.height = `${window.innerHeight}px`;
+                renderFrame();
+            };
+            window.addEventListener('resize', resize);
+            resize();
+        }
+
+        function renderFrame() {
+            const img = frames[state.frame];
+            if (!img) return;
+            const cw = window.innerWidth, ch = window.innerHeight;
+            const scale = Math.max(cw / img.width, ch / img.height);
+            const x = (cw / 2) - (img.width / 2) * scale;
+            const y = (ch / 2) - (img.height / 2) * scale;
+            context.clearRect(0, 0, cw, ch);
+            context.drawImage(img, x, y, img.width * scale, img.height * scale);
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  HOME BUTTON
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        function setupHomeButton(lenis) {
+            const homeBtn = document.getElementById('home-btn');
+            const SCROLL_THRESHOLD = window.innerHeight * 0.3;
+
+            // Show / hide based on scroll position
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > SCROLL_THRESHOLD) {
+                    homeBtn.classList.add('visible');
+                } else {
+                    homeBtn.classList.remove('visible');
+                }
+            }, { passive: true });
+
+            // Smooth scroll to top via Lenis
+            homeBtn.addEventListener('click', () => {
+                lenis.scrollTo(0, { duration: 1.6, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+            });
+        }
+
+        function setupAnimations() {
+            // Frame scrubbing
+            ScrollTrigger.create({
+                trigger: '.scroll-track',
+                start: 'top top', end: 'bottom bottom',
+                scrub: 0,
+                onUpdate: (self) => {
+                    let fi = Math.round(self.progress * (frames.length - 1));
+                    fi = Math.max(0, Math.min(fi, frames.length - 1));
+                    if (fi !== state.frame) { state.frame = fi; requestAnimationFrame(renderFrame); }
+                }
+            });
+
+            // Title fade
+            gsap.timeline({
+                scrollTrigger: {
+                    trigger: '.scroll-track',
+                    start: 'top top', end: '15% top', scrub: true
+                }
+            }).to([brandTitle, brandSubtitle], { y: -30, autoAlpha: 0, duration: 1, ease: 'power3.in' });
+
+            // HUD cards appear
+            const uiOverlay = document.getElementById('info-overlay');
+            const uiCards = document.querySelectorAll('.portal-card');
+
+            ScrollTrigger.create({
+                trigger: '.scroll-track',
+                start: '63% top', end: '85% top',
+                onEnter: () => {
+                    gsap.to(uiOverlay, { autoAlpha: 1, duration: 0.5 });
+                    gsap.fromTo(uiCards,
+                        { y: 30, autoAlpha: 0, scale: 0.9 },
+                        { y: 0, autoAlpha: 1, scale: 1, duration: 0.6, stagger: 0.12, ease: 'back.out(1.4)', overwrite: true }
+                    );
+                },
+                onLeave: () => { gsap.to(uiOverlay, { autoAlpha: 0, duration: 0.4 }); },
+                onEnterBack: () => {
+                    gsap.to(uiOverlay, { autoAlpha: 1, duration: 0.4 });
+                    gsap.to(uiCards, { y: 0, autoAlpha: 1, scale: 1, duration: 0.4, stagger: 0.08, overwrite: true });
+                },
+                onLeaveBack: () => { gsap.to(uiOverlay, { autoAlpha: 0, duration: 0.4 }); }
+            });
+        }
+
+        init();
+    </script>
+
+    <script type="module" defer>
+        import Chatbot from "https://cdn.n8nchatui.com/v1/embed.js";
+        Chatbot.init({
+            "n8nChatUrl": "https://irritable-unsegmentally-kim.ngrok-free.dev/webhook/7d2ecd50-140d-4b7d-a07b-42300ce295b0/chat",
+            "metadata": {}, // Include any custom data to send with each message to your n8n workflow
+            "theme": {
+                "button": {
+                    "backgroundColor": "#ee8181",
+                    "right": 20,
+                    "bottom": 20,
+                    "size": 60,
+                    "iconColor": "#373434",
+                    "customIconSrc": "https://www.svgrepo.com/show/339332/machine-learning-04.svg",
+                    "customIconSize": 73,
+                    "customIconBorderRadius": 27,
+                    "autoWindowOpen": {
+                        "autoOpen": false,
+                        "openDelay": 2
+                    },
+                    "borderRadius": "rounded",
+                    "draggable": true
+                },
+                "tooltip": {
+                    "showTooltip": true,
+                    "tooltipMessage": "Lets Explore the Cosmos 🚀🧑‍🚀",
+                    "tooltipBackgroundColor": "#fff9f6",
+                    "tooltipTextColor": "#1c1c1c",
+                    "tooltipFontSize": 15,
+                    "hideTooltipOnMobile": false
+                },
+                "allowProgrammaticMessage": false,
+                "chatWindow": {
+                    "borderRadiusStyle": "rounded",
+                    "avatarBorderRadius": 19,
+                    "messageBorderRadius": 6,
+                    "showTitle": true,
+                    "title": "Galileo AI",
+                    "titleAvatarSrc": "https://www.svgrepo.com/show/339332/machine-learning-04.svg",
+                    "avatarSize": 29,
+                    "welcomeMessage": "Hello! I’m Galileo AI 👋\nI’m here to help you find answers from our documents, guides, and knowledge base. Ask me a question, and I’ll do my best to give you a clear and accurate response",
+                    "errorMessage": "Please connect me to n8n first",
+                    "backgroundColor": "#ffffff",
+                    "height": 600,
+                    "width": 400,
+                    "fontSize": 16,
+                    "starterPrompts": [
+                        "Tell me what are constellations"
+                    ],
+                    "starterPromptFontSize": 15,
+                    "renderHTML": false,
+                    "clearChatOnReload": false,
+                    "showScrollbar": false,
+                    "botMessage": {
+                        "backgroundColor": "#f36539",
+                        "textColor": "#fafafa",
+                        "showAvatar": true,
+                        "avatarSrc": "https://www.svgrepo.com/show/334455/bot.svg",
+                        "showCopyToClipboardIcon": false
+                    },
+                    "userMessage": {
+                        "backgroundColor": "#f2ccc0",
+                        "textColor": "#050505",
+                        "showAvatar": true,
+                        "avatarSrc": "https://www.svgrepo.com/show/532363/user-alt-1.svg"
+                    },
+                    "textInput": {
+                        "placeholder": "Type your query",
+                        "backgroundColor": "#ffffff",
+                        "textColor": "#1e1e1f",
+                        "sendButtonColor": "#f36539",
+                        "maxChars": 50,
+                        "maxCharsWarningMessage": "You exceeded the characters limit. Please input less than 50 characters.",
+                        "autoFocus": false,
+                        "borderRadius": 9,
+                        "sendButtonBorderRadius": 50
+                    }
+                }
+            }
+        });
+    </script>
+
+</body>
+
+</html>
