@@ -35,4 +35,18 @@ Its purpose is to simplify the process of finding good observation spots by cons
 - **Browser Geolocation API** — Built-in browser feature that gets a user's GPS coordinates (with permission).
 - **n8n Webhook** — Automation endpoint that receives data and triggers workflows (e.g., for a chatbot backend like Galileo AI).
 
+<h1>🤩 Features</h1> 
+
+The main features of my Project is the Scroll-Driven Animation which the main page of Akash khoj uses. How it works - At its core, the entire background is a 36-frame space sequence rendered on an HTML5 Canvas — you literally control the cinematic by scrolling. Scroll slowly and the space scene drifts gently; scroll fast and it rushes past. The page preloads all 36 frames before revealing itself, so the experience is always completely smooth.
+
+The other aspects of this are as follows: 
+
+-1) **Lunara — Moon Phase Tracker**
+An interactive 3D moon visualization app that shows the exact lunar phase and lighting for any selected date, along with live weather data to calculate a stargazing score based on moon brightness, wind, and cloud coverage. It also includes a calendar, circular weather gauges, and upcoming lunar events like Full Moons and Supermoons.
+
+-2) **Nebula Air Index (NAI)**
+A real-time air quality monitoring dashboard that automatically detects your location and displays your city’s AQI instantly, alongside live AQI data from 12 major global cities. It uses a six-tier international scale (Good to Hazardous) and presents the information in a visually immersive space-themed interface.
+
+-3) **Hermes HandBook**
+A virtual astronomy codex designed as an interactive 3D flipbook that mimics an ancient Roman manuscript, complete with Latin headings, classical typography, and atmospheric candlelit visuals. It delivers educational content about stars, constellations, and planets through an immersive, book-like reading experience.
 
