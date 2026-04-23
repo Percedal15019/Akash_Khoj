@@ -16,7 +16,7 @@ Its purpose is to simplify the process of finding good observation spots by cons
 
 <br> 
 
-→ **Libraries**
+<h2><b> → Libraries </b></h2>
 - **Lenis 1.0.42** — A smooth scrolling library that creates fluid, inertia-based scroll effects.
 - **GSAP 3.12.5 + ScrollTrigger** — Powerful animation library with scroll-based animation control.
 - **Three.js r128** — JavaScript library for creating 3D graphics in the browser using WebGL.
@@ -26,7 +26,7 @@ Its purpose is to simplify the process of finding good observation spots by cons
 
 <br>
 
-→ **APIs**
+<h2><b> → APIs </b></h2>
 - **Open-Meteo** — Free weather API providing data like wind speed, temperature, and cloud coverage.
 - **AQICN Feed** — API providing real-time air quality index (AQI) data for cities.
 - **ip-api.com** — Service that detects a user's location (city, country) via their IP address.
