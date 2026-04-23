@@ -10,8 +10,6 @@ Its purpose is to simplify the process of finding good observation spots by cons
 
 <h1>😇 Technologies</h1>
 
-<br>
-
 <h2><b> → Languages </b></h2>
 
 - **HTML5** — The standard markup language used to structure web pages and web apps.
