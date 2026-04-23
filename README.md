@@ -62,7 +62,7 @@ Initially, i have created a flow chart of how our project should look like how s
 
 Also there a was a small competition in the college for presenting everyones project. At first the supervisor was very confuse about our project but later she was interested and we in detailed explained every bits of our project that how i made it and what kind of things are there in it. She told us that this is a very unique and different project than anyother but we didnt get selected as the other PS were health related and had an impact on the medical field so we were unseen at the end. Let it be i am not sad or angry about it becuase i love the way i made it with my own efforts without any worries of fruit. 
 
-Which is why, Akash Khoj is avaiable to everyone for showcasing my learnings which i had along the way.
+Which is why, **Akash Khoj** is avaiable to everyone for showcasing my learnings which i had along the way.
 
 <h1>📈 Overall Growth</h1>
 
