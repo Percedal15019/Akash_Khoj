@@ -53,3 +53,22 @@ A real-time air quality monitoring dashboard that automatically detects your loc
 
 A virtual astronomy codex designed as an interactive 3D flipbook that mimics an ancient Roman manuscript, complete with Latin headings, classical typography, and atmospheric candlelit visuals. It delivers educational content about stars, constellations, and planets through an immersive, book-like reading experience.
 
+
+<h1>👨‍💻 The Process</h1>
+
+This idea was originated by my friend. He and I were jogging in the evening and i asked him about what project should i do next. And he suggested me to build "Akash Khoj" which would help me and him to monitor the weather as well as light level condition of our surroundings. So he has a contribution to this idea whatsoever.
+
+Initially, i have created a flow chart of how our project should look like how should it work. and after 1 month of preparations and hardwork we were able to build this website/project completely. It was a great learning experience that i got by this and i hope that i will like to work on different and innovstive projects in the future.
+
+Also there a was a small competition in the college for presenting everyones project. At first the supervisor was very confuse about our project but later she was interested and we in detailed explained every bits of our project that how i made it and what kind of things are there in it. She told us that this is a very unique and different project than anyother but we didnt get selected as the other PS were health related and had an impact on the medical field so we were unseen at the end. Let it be i am not sad or angry about it becuase i love the way i made it with my own efforts without any worries of fruit. 
+
+Which is why, Akash Khoj is avaiable to everyone for showcasing my learnings which i had along the way.
+
+<h1>📈 Overall Growth</h1>
+
+I have grown significantly with each part of this project helped me understand more about building apps, managing complex information and improving user experience. It was more than just making an app, it was about solving problems, learning new things and improving my skills for the future work.
+
+<h1>🚦 Running the Project</h1>
+
+
+
