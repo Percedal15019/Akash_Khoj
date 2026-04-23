@@ -41,12 +41,15 @@ The main features of my Project is the Scroll-Driven Animation which the main pa
 
 The other aspects of this are as follows: 
 
--1) **Lunara — Moon Phase Tracker**
+1) **Lunara — Moon Phase Tracker**
+
 An interactive 3D moon visualization app that shows the exact lunar phase and lighting for any selected date, along with live weather data to calculate a stargazing score based on moon brightness, wind, and cloud coverage. It also includes a calendar, circular weather gauges, and upcoming lunar events like Full Moons and Supermoons.
 
--2) **Nebula Air Index (NAI)**
+2) **Nebula Air Index (NAI)**
+
 A real-time air quality monitoring dashboard that automatically detects your location and displays your city’s AQI instantly, alongside live AQI data from 12 major global cities. It uses a six-tier international scale (Good to Hazardous) and presents the information in a visually immersive space-themed interface.
 
--3) **Hermes HandBook**
+3) **Hermes HandBook**
+
 A virtual astronomy codex designed as an interactive 3D flipbook that mimics an ancient Roman manuscript, complete with Latin headings, classical typography, and atmospheric candlelit visuals. It delivers educational content about stars, constellations, and planets through an immersive, book-like reading experience.
 
