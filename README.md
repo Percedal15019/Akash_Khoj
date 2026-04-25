@@ -83,6 +83,8 @@ A virtual astronomy codex designed as an interactive 3D flipbook that mimics an 
 
 4) **Galileo AI**:
 
+Galileo AI is the built-in astronomy-focused chatbot in Akash Khoj, named after Galileo Galilei. It acts as a cosmic guide that answers questions about constellations, planets, moon phases, air quality, and space science. Its intelligence comes from the n8n backend, which may use a RAG knowledge system or an AI model like GPT/Gemini with an astronomy-focused prompt.
+
 <br>
 
 <table><tr><td><img src="akash-khoj/Frames/OtherFrames/Galileo%20AI.png" width="350"></td></tr></table>
@@ -116,3 +118,17 @@ To run the project in your local environment, follow these steps:
 3. Now open the ```akash khoj``` folder in that run the ```index.html``` file and enjoy the exploration.
 
 <br>
+
+**🔴 NOTE:**
+
+1. 
+
+
+
+
+
+
+
+
+
+
