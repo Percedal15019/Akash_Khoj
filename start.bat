@@ -39,7 +39,7 @@ echo.
 :: Uses 127.0.0.1 (same origin as VS Code Live Server) to keep zoom consistent
 start /b cmd /c "timeout /t 2 /nobreak >nul && start http://127.0.0.1:5500/akash-khoj/"
 
-:: Start Python HTTP server from this directory (MiniProject - Copy root)
+:: Start Python HTTP server from this directory
 :: IMPORTANT: Must run from root so ../lunar/ ../nai/ ../hermes/ paths work
 python -m http.server 5500
 
