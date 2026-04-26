@@ -116,7 +116,11 @@ To run the project in your local environment, follow these steps:
 1. Clone the repository to your local machine.
 2. Download "`Live Server`" extension from Extensions in Visual Studio Code for easily executing the code.
 3. Now open the ```akash khoj``` folder in that run the ```index.html``` file and enjoy the exploration.
+
+
 --------------------------------------------------------------------**OR**--------------------------------------------------------------------
+
+
 4. Just double-click the ```start.bat``` file so easily execute the website quickly.
 
 <br>
