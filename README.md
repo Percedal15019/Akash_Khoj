@@ -118,7 +118,7 @@ To run the project in your local environment, follow these steps:
 3. Now open the ```akash khoj``` folder in that run the ```index.html``` file and enjoy the exploration.
 
 
---------------------------------------------------------------------**OR**--------------------------------------------------------------------
+--------------------------------------------------------------**OR**---------------------------------------------------------------
 
 
 4. Just double-click the ```start.bat``` file so easily execute the website quickly.
