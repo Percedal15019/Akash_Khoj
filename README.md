@@ -97,8 +97,7 @@ This idea was originated by my friend. He and I were jogging in the evening and 
 
 Initially, i have created a flow chart of how our project should look like how should it work. and after 1 month of preparations and hardwork we were able to build this website/project completely. It was a great learning experience that i got by this and i hope that i will like to work on different and innovstive projects in the future.
 
-<table><tr><td><img src="akash-khoj/Frames/OtherFrames/Workflow.jpeg" width="350"></td></tr></table>
-
+<table><tr><td><img src="akash-khoj/Frames/OtherFrames/Workflow.jpeg" width="700"></td></tr></table>
 
 Also there a was a small competition in the college for presenting everyones project. At first the supervisor was very confuse about our project but later she was interested and we in detailed explained every bits of our project that how i made it and what kind of things are there in it. She told us that this is a very unique and different project than anyother but we didnt get selected as the other PS were health related and had an impact on the medical field so we were unseen at the end. Let it be i am not sad or angry about it becuase i love the way i made it with my own efforts without any worries of fruit. 
 
