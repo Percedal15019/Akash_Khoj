@@ -135,7 +135,9 @@ To run the project in your local environment, follow these steps:
 
 **🔴 NOTE:**
 
-1. 
+1. There are some cons which you should be aware of :-
+  a. The scrolling animation may look a little stiff (The solution upload all the frames to a [CDN server](https://www.cloudflare.com/learning/cdn/what-is-a-cdn/) which loads it for you). I was unable because of my time constraints.
+  b. Also upload your own n8n webhook URL in the 
 
 
 
