@@ -51,7 +51,7 @@ The main features of my Project is the **Scroll-Driven Animation** which the mai
 
 The other aspects of this are as follows: 
 
-<h2> 1) **Lunara — Moon Phase Tracker**: </h2>
+1) **Lunara — Moon Phase Tracker**:
 
 An interactive 3D moon visualization app that shows the exact lunar phase and lighting for any selected date, along with live weather data to calculate a stargazing score based on moon brightness, wind, and cloud coverage. It also includes a calendar, circular weather gauges, and upcoming lunar events like Full Moons and Supermoons.
 
