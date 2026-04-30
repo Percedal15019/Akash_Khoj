@@ -1,6 +1,6 @@
-<h1>🌌 Akash Khoj</h1>
+<h1><b>🌌 Akash Khoj </b></h1>
 
-Akash Khoj is a system being developed to help people find optimal conditions for observing the night sky. It’s essentially a unified platform that analyzes environmental factors – air quality, lunar brightness, and geographic location – to identify areas with clearer skies suitable for stargazing or astrophotography. 
+**Akash Khoj** is a system being developed to help people find optimal conditions for observing the night sky. It’s essentially a unified platform that analyzes environmental factors – air quality, lunar brightness, and geographic location – to identify areas with clearer skies suitable for stargazing or astrophotography. 
 
 <br>
 
