@@ -135,16 +135,23 @@ To run the project in your local environment, follow these steps:
 
 **🔴 NOTE:**
 
-1. There are some cons which you should be aware of :-
-  a. The scrolling animation may look a little stiff (The solution upload all the frames to a [CDN server](https://www.cloudflare.com/learning/cdn/what-is-a-cdn/) which loads it for you). I was unable because of my time constraints.
-  b. Also upload your own n8n webhook URL in the 
+There are some cons which you should be aware of :
+  
+1. The scrolling animation may look a little stiff (The solution upload all the frames to a [CDN server](https://www.cloudflare.com/learning/cdn/what-is-a-cdn/) which loads it for you). I was unable because of my time constraints.
+2. Also **paste your own n8n webhook URL** in the required place as it is necessary for the AI bot to work.
+3. The AQI API works but the results are displayed in a wrong way so if you use it take that into account.
+4. If you want to remove the flipbook you can, it was always a nuisance for me but an enjoying experience it was (To explore different shits and make something out of it) It is childish and i would recommend to add something else.
+5. The **Moon 3D model** is 3-4 days going behind but there is no issue with the calender, so you have to synchronize it and use it as per.
+6. Add a beter API for celestial events and display them neatly.
 
+<br>
 
+**What Else Can I Do In This ??**
 
+The other things or features you can add or i would like to suggest is:
 
-
-
-
-
-
-
+- **AR Feature**
+- **How to Identify the constellations easily with their signature stars ??**
+- **Events and Alerts**
+- **More details regarding stars and all**
+- **I also have an idea to monetize this it goes like ads or suggessions for telescopes, lens, equipments, tents and so on**
