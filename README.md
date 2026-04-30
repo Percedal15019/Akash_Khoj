@@ -32,7 +32,7 @@ Its purpose is to simplify the process of finding good observation spots by cons
 <h2><b> → APIs </b></h2>
 
 - **Open-Meteo** — Free weather API providing data like wind speed, temperature, and cloud coverage.
-- **AQICN Feed** — API providing real-time air quality index (AQI) data for cities.
+- [**AQICN Feed**](https://aqicn.org/city/india/mumbai/kurla/) — API providing real-time air quality index (AQI) data for cities.
 - **ip-api.com** — Service that detects a user's location (city, country) via their IP address.
 - **Browser Geolocation API** — Built-in browser feature that gets a user's GPS coordinates (with permission).
 - **n8n Webhook** — Automation endpoint that receives data and triggers workflows (e.g., for a chatbot backend like Galileo AI).
