@@ -71,6 +71,14 @@ A real-time air quality monitoring dashboard that automatically detects your loc
 
 <br>
 
+<table><tr><td><img src="akash-khoj/Frames/OtherFrames/Atlas%20Map.png" width="700"></td></tr></table>
+
+<br>
+
+Also special thanks to [djlorenz](https://github.com/djlorenz) for providing such a great data about the Light Pollution. I have read about it and it is very detailed and helpful so **Thank You** for this. 
+
+<br>
+
 3) **Hermes HandBook**:
 
 A virtual astronomy codex designed as an interactive 3D flipbook that mimics an ancient Roman manuscript, complete with Latin headings, classical typography, and atmospheric candlelit visuals. It delivers educational content about stars, constellations, and planets through an immersive, book-like reading experience.
