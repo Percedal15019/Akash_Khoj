@@ -155,3 +155,20 @@ The other things or features you can add or i would like to suggest is:
 - **Events and Alerts**
 - **More details regarding stars and all**
 - **I also have an idea to monetize this it goes like ads or suggessions for telescopes, lens, equipments, tents and so on**
+
+
+<br>
+
+<br>
+
+<>"I love the way I made it — with my own efforts, without any worries of the fruit."
+
+
+
+
+
+
+
+
+
+
