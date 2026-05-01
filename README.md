@@ -158,18 +158,9 @@ The other things or features you can add or i would like to suggest is:
 
 
 <br>
-
+<br>
 <br>
 
 <p align="center">
 <i>"I love the way I made it — with my own efforts, without any worries of the fruit."</i>
 </p>
-
-
-
-
-
-
-
-
-
