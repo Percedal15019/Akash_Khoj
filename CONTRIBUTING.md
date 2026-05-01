@@ -9,9 +9,6 @@ Whether you're fixing a bug, improving the UI, or adding a whole new feature —
 
 - [Getting Started](#getting-started)
 - [Ways to Contribute](#ways-to-contribute)
-- [Known Issues to Fix](#known-issues-to-fix)
-- [Feature Ideas](#feature-ideas)
-- [Code Guidelines](#code-guidelines)
 - [How to Submit a Pull Request](#how-to-submit-a-pull-request)
 - [Code of Conduct](#code-of-conduct)
 
