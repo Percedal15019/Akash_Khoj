@@ -5,7 +5,7 @@ Whether you're fixing a bug, improving the UI, or adding a whole new feature —
 
 ---
 
-## 🧭 Table of Contents
+# 🧭 Table of Contents
 
 - [Getting Started](#getting-started)
 - [Ways to Contribute](#ways-to-contribute)
