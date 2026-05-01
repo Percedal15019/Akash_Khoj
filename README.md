@@ -71,7 +71,7 @@ A real-time air quality monitoring dashboard that automatically detects your loc
 
 <br>
 
-<table><tr><td><img src="akash-khoj/Frames/OtherFrames/Atlas%20Map.png" width="700"></td></tr></table>
+<table><tr><td><img src="akash-khoj/Frames/OtherFrames/Atlas%20Map.png" width="800"></td></tr></table>
 
 <br>
 
