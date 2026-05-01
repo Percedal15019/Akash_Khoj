@@ -45,17 +45,23 @@ There are many ways you can contribute — you don't have to be a hardcore devel
    git checkout -b feature/your-feature-name
    ```
    
+<br>
+   
 2. **Make your changes and commit:**
    
    ```bash
    git commit -m "Add: brief description of your change"
    ```
+   
+<br>
 
 3. **Push to your fork:**
 
    ```bash
    git push origin feature/your-feature-name
    ```
+
+<br>
 
 4. **Open a Pull Request on the main repository with:**
 
