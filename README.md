@@ -20,12 +20,12 @@ Its purpose is to simplify the process of finding good observation spots by cons
 
 <h2><b> → Libraries </b></h2>
 
-- **Lenis 1.0.42** — A smooth scrolling library that creates fluid, inertia-based scroll effects.
-- **GSAP 3.12.5 + ScrollTrigger** — Powerful animation library with scroll-based animation control.
-- **Three.js r128** — JavaScript library for creating 3D graphics in the browser using WebGL.
-- **SunCalc** — Library for calculating sun position, sunrise, sunset, and moon data based on location.
-- **Lucide** — Open-source icon library for clean, customizable SVG icons.
-- **Tailwind CSS** — Utility-first CSS framework for rapidly building custom designs.
+- [Lenis 1.0.42](https://www.lenis.dev/) — A smooth scrolling library that creates fluid, inertia-based scroll effects.
+- [GSAP 3.12.5 + ScrollTrigger](https://gsap.com/) — Powerful animation library with scroll-based animation control.
+- [Three.js r128](https://threejs.org/) — JavaScript library for creating 3D graphics in the browser using WebGL.
+- [Tailwind CSS](https://tailwindcss.com/) — Utility-first CSS framework for rapidly building custom designs.
+- [Lucide](https://lucide.dev/) — Open-source icon library for clean, customizable SVG icons.
+- [SunCalc](https://www.suncalc.org/) — Library for calculating sun position, sunrise, sunset, and moon data based on location.
 
 <br>
 
