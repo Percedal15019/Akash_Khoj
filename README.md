@@ -141,6 +141,12 @@ To run the project in your local environment, follow these steps:
 
 <br>
 
+<h1> → License </h1>
+
+This Project is licensed under [MIT License]()
+
+<br>
+
 **🔴 NOTE:**
 
 There are some cons which you should be aware of :
