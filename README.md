@@ -127,6 +127,18 @@ I have grown significantly with each part of this project helped me understand m
 
 <br>
 
+<h2><b>🤔 What Else Can I Do In This ?? </b></h2>
+
+The other things or features you can add or i would like to suggest is:
+
+- **AR Feature**
+- **How to Identify the constellations easily with their signature stars ??**
+- **Events and Alerts**
+- **More details regarding stars and all**
+- **I also have an idea to monetize this it goes like ads or suggessions for telescopes, lens, equipments, tents and so on**
+
+<br>
+
 <h1>🚦 Running the Project</h1>
 
 To run the project in your local environment, follow these steps:
@@ -160,19 +172,6 @@ There are some cons which you should be aware of :
 4. If you want to remove the flipbook you can, it was always a nuisance for me but an enjoying experience it was (To explore different shits and make something out of it) It is childish and i would recommend to add something else.
 5. The **Moon 3D model** is 3-4 days going behind but there is no issue with the calender, so you have to synchronize it and use it as per.
 6. Add a beter API for celestial events and display them neatly.
-
-<br>
-
- **🤔 What Else Can I Do In This ??**
-
-The other things or features you can add or i would like to suggest is:
-
-- **AR Feature**
-- **How to Identify the constellations easily with their signature stars ??**
-- **Events and Alerts**
-- **More details regarding stars and all**
-- **I also have an idea to monetize this it goes like ads or suggessions for telescopes, lens, equipments, tents and so on**
-
 
 <br>
 <br>
