@@ -146,6 +146,7 @@ To run the project in your local environment, follow these steps:
 This Project is licensed under [MIT License](https://github.com/Percedal15019/Akash_Khoj/blob/main/LICENSE)
 
 <br>
+<br>
 
 **🔴 NOTE:**
 
