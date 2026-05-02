@@ -53,7 +53,7 @@ The other aspects of this are as follows:
 
 <br>
 
-<h2><b> 1) Lunara — <i>Moon Phase Tracker</i> : </b></h2>
+<h2><b> 1) Lunara — <i>Moon Phase Tracker</i> </b></h2>
 
 An interactive 3D moon visualization app that shows the exact lunar phase and lighting for any selected date, along with live weather data to calculate a stargazing score based on moon brightness, wind, and cloud coverage. It also includes a calendar, circular weather gauges, and upcoming lunar events like Full Moons and Supermoons.
 
@@ -63,7 +63,7 @@ An interactive 3D moon visualization app that shows the exact lunar phase and li
 
 <br>
 
-<h2><b> 2) Nebula Air Index (NAI): </b></h2>
+<h2><b> 2) Nebula Air Index (NAI) </b></h2>
 
 A real-time air quality monitoring dashboard that automatically detects your location and displays your city’s AQI instantly, alongside live AQI data from 12 major global cities. It uses a six-tier international scale (Good to Hazardous) and presents the information in a visually immersive space-themed interface.
 
@@ -81,7 +81,7 @@ Also special thanks to [djlorenz](https://github.com/djlorenz) for providing suc
 
 <br>
 
-<h2><b> 3) Hermes HandBook: </b></h2>
+<h2><b> 3) Hermes HandBook </b></h2>
 
 A virtual astronomy codex designed as an interactive 3D flipbook that mimics an ancient Roman manuscript, complete with Latin headings, classical typography, and atmospheric candlelit visuals. It delivers educational content about stars, constellations, and planets through an immersive, book-like reading experience.
 
@@ -91,7 +91,7 @@ A virtual astronomy codex designed as an interactive 3D flipbook that mimics an 
 
 <br>
 
-<h2><b> 4) Galileo AI: </b></h2>
+<h2><b> 4) Galileo AI </b></h2>
 
 It is the built-in astronomy-focused chatbot in Akash Khoj, named after Galileo Galilei. It acts as a cosmic guide that answers questions about constellations, planets, moon phases, air quality, and space science. Its intelligence comes from the n8n backend, which may use a RAG knowledge system or an AI model like GPT/Gemini with an astronomy-focused prompt.
 
