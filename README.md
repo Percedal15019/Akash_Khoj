@@ -41,8 +41,6 @@ Its purpose is to simplify the process of finding good observation spots by cons
 
 <h1>🤩 Features</h1> 
 
-The Significance of Akash Khoj is that as follows:
-
 - Currently, anyone wanting to **stargaze** has to check multiple sources separately — **weather apps** for cloud cover, **AQI apps** for air quality, **moon phase websites** for lunar data, and **maps** for location suitability. Akash Khoj consolidates all of this into one unified platform, saving time and effort. It directly addresses the frustration of scattered information.
 - Essentially, **Akash Khoj** is a one-stop gateway into astronomy for anyone.
 - The main features of my Project is the **Scroll-Driven Animation** which the main page of Akash khoj uses. *How it works* - At its core, the entire background is a 36-frame space sequence rendered on an HTML5 Canvas — you literally control the cinematic by scrolling. Scroll slowly and the space scene drifts gently; scroll fast and it rushes past. The page preloads all 36 frames before revealing itself, so the experience is always completely smooth.
