@@ -173,7 +173,7 @@ There are some cons which you should be aware of :
 3. The AQI API works but the results are displayed in a wrong way so if you use it take that into account.
 4. If you want to remove the flipbook you can, it was always a nuisance for me but an enjoying experience it was (To explore different shits and make something out of it) It is childish and i would recommend to add something else.
 5. The **Moon 3D model** is 3-4 days going behind but there is no issue with the calender, so you have to synchronize it and use it as per.
-6. Add a beter API for celestial events and display them neatly.
+6. Add a better API for celestial events and display them neatly.
 
 <br>
 <br>
